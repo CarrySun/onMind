@@ -1,6 +1,6 @@
 /**
  * @file 上传服务
- * @author ym3
+ * @author CarrySun
  */
 import axios from 'axios';
 import setting from './setting';

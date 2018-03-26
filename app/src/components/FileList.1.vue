@@ -2,7 +2,7 @@
   <div class="right">
       <div class="title">{{pageName}}</div>
       <div v-if = "noFiles" class="noFiles">
-        <img class="logo" src="../assets/images/home/folder.svg">
+        <img class="logo" src="../assets/images/owner/folder.svg">
         <div style="color:#ccc">当前文件夹暂无文件</div>
       </div>
       <div v-else>
@@ -21,7 +21,7 @@
               <td>{{item.fileName}}</td>
               <td class="flex">
                 {{item.author}}
-                <img @click = "doList" class="doIcon" src="../assets/images/home/list.svg"/>
+                <img @click = "doList" class="doIcon" src="../assets/images/owner/list.svg"/>
                 <div class="menu">
                   <ul>
                     <li tit="view"><span class="icons"></span> &nbsp;&nbsp;浏览</li>

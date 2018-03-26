@@ -18,6 +18,10 @@ vue + vue-router + vuex  + webpack + koa2 + scss + es6
 
 ## 总结
 
+1、web版本的JavaScript思维导图（BSD开源协议）【戳这里去官网】。
+
+2、easyui最新版【戳这里去官网】。
+
 ### 服务构建
 
 ``` bash
@@ -34,23 +38,5 @@ npm run build
 npm run build --report
 
 # 请求路径
-http://127.0.0.1:8080/pages/homePage.html
-
+http://127.0.0.1:8080/pages/owner.html
 ```
-
-### 容器化
-
-```bash
-cd deepnet-web
-# 服务构建
-docker build -t deepnet-web .
-# 运行服务
-docker run --name deepnet-web-service -d -p8000:8000 deepnet-web
-# 查看服务
-docker ps
-# 请求路径
-http://127.0.0.1:8000/depth/pages/homePage.html
-```
-
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

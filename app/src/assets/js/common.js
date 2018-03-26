@@ -1,6 +1,6 @@
 /**
  * @file 页面公共模块，包含基础公共依赖
- * @author ym3
+ * @author CarrySun
  */
 require('../css/common.less');
 

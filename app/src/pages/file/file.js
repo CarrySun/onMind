@@ -3,17 +3,16 @@
  * @author CarrySun
  */
 import Vue from 'vue'
-import friend from './friend.vue'
-import store from './friendStore'
+import file from './file.vue'
+import store from './fileStore'
 // import router from './router'
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
 new Vue({
   store,
   el: '#app',
   // router,
-  template: '<friend/>',
-  components: {friend}
+  template: '<file/>',
+  components: {file}
 })

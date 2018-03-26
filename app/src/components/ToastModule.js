@@ -1,6 +1,6 @@
 /**
  * @file toast组件的module
- * @author ym3
+ * @author CarrySun
  */
 /**
  * [createModule 创建module方法]

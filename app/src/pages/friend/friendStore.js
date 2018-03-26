@@ -1,6 +1,6 @@
 /**
  * @file 首页store
- * @author ym3
+ * @author CarrySun
  */
 import Vue from 'vue'
 import Vuex from 'vuex'

@@ -2,7 +2,7 @@
   <div class="right">
       <div class="title">{{pageName}}</div>
       <div v-if = "noFiles" class="noFiles">
-        <img class="logo" src="../assets/images/home/folder.svg">
+        <img class="logo" src="../assets/images/owner/folder.svg">
         <div style="color:#ccc">当前文件夹暂无文件</div>
       </div>
       <div v-else>
@@ -12,6 +12,7 @@
               <th>文件名</th>
               <th>拥有者</th>
               <th>最后修改时间</th>
+              <!-- <th>操作</th> -->
             </tr>
           </thead>
           <tbody>
@@ -19,31 +20,22 @@
             v-for = "(item, index) in FileListData"
             :key = index>
               <td>{{item.file_title}}</td>
-              <td class="flex">
-                {{item.file_owner}}
-                <img @click = "doList" class="doIcon" src="../assets/images/home/list.svg"/>
-                <div class="menu">
-                  <ul v-if = "type === 'owner'">
-                    <li tit="view"><span class="icons"></span> &nbsp;&nbsp;浏览</li>
-                    <li tit="rename"><span class="icons"></span> &nbsp;&nbsp;重命名</li>
-                    <li tit="colla"><span class="icons"></span> &nbsp;&nbsp;协作</li>
-                    <li tit="share"><span class="icons"></span> &nbsp;&nbsp;分享</li>
-                    <li tit="clone"><span class="icons"></span> &nbsp;&nbsp;克隆</li>
-                    <li class="sep"></li>
-                    <li tit="del"><span class="icons"></span> &nbsp;&nbsp;删除</li>
-                  </ul>
-                  <ul v-else-if = "type === 'partner'">
-                    <li tit="view"><span class="icons"></span> &nbsp;&nbsp;浏览</li>
-                    <li tit="rename"><span class="icons"></span> &nbsp;&nbsp;重命名</li>
-                    <li tit="colla"><span class="icons"></span> &nbsp;&nbsp;协作</li>
-                    <li tit="share"><span class="icons"></span> &nbsp;&nbsp;分享</li>
-                    <li tit="clone"><span class="icons"></span> &nbsp;&nbsp;克隆</li>
-                    <li class="sep"></li>
-                    <li tit="del"><span class="icons"></span> &nbsp;&nbsp;删除</li>
-                  </ul>
-                </div>
-              </td>
+              <td>{{item.file_owner}}</td>
               <td>{{new Date(item.updateTime).toLocaleString()}}</td>
+              <!-- <td>
+                <ul class="todo" v-if = "type === 'owner'">
+                  <li class="item">操作</li>
+                  <li class="item">浏览</li>
+                  <li class="item">重命名</li>
+                  <li class="item">协作</li>
+                  <li class="item">分享</li>
+                  <li class="item">克隆</li>
+                </ul>
+                <ul class="todo" v-else-if = "type === 'partner'">
+                  <li class="item">浏览</li>
+                  <li class="item">退出协作</li>
+                </ul>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -55,13 +47,6 @@
 import { mapState, mapGetters } from "vuex";
 export default {
   name: "fileList",
-  data() {
-    return {
-      type: fileList.type,
-      noFiles: true,
-      pageName: this.$store.state.FileList.pageName
-    };
-  },
   computed: {
     ...mapState({
       FileList: "FileList"
@@ -69,6 +54,13 @@ export default {
     ...mapGetters({
       FileListData: "FileListData"
     })
+  },
+  data() {
+    return {
+      type: this.$store.state.FileList.type,
+      noFiles: true,
+      pageName: this.$store.state.FileList.pageName
+    };
   },
   watch: {
     FileListData() {
@@ -81,16 +73,19 @@ export default {
   },
   methods: {
     doList(e) {
-      if (e.target.nextElementSibling.style.display == "block") {
+      if (e.target.nextElementSibling.style.display == "inline") {
         e.target.nextElementSibling.style.display = "none";
       } else {
-        e.target.nextElementSibling.style.display = "block";
+        e.target.nextElementSibling.style.display = "inline";
       }
     }
   }
 };
 </script>
 <style scopt lang = "scss">
+tr:hover{
+  cursor: pointer;
+}
 th {
   text-align: left;
   padding: 20px 10px 15px 0;
@@ -110,46 +105,30 @@ td:nth-child(2) {
 td:nth-child(3) {
   width: 30%;
 }
-tbody {
-  .doIcon {
-    width: 20px;
-    display: none;
-    position: absolute;
-    right: 0;
-  }
-  tr:hover {
-    cursor: pointer;
-    .doIcon {
-      display: inline;
-    }
-  }
-}
-.menu {
-  display: none;
+.todo {
   position: absolute;
   right: 0;
-  z-index:5;
-  background: #fff;
-  border-radius: 5px;
-}
-.menu ul,
-li {
+  top: 0;
   list-style: none;
-}
-.menu li:hover {
-  cursor: pointer;
-  background: #ccc;
-}
-.menu li {
-  padding: 7px 10px;
-  cursor: default;
-  color: #444;
-  line-height: 20px;
-}
-.menu li.sep {
-  margin: 3px 0;
-  padding: 0;
-  height: 1px;
-  background: #e7e7e7;
+  width: 80px;
+  line-height: 38px;
+  overflow: hidden;
+  background-color: #eee;
+  height: 38px;
+  margin-top: 1px;
+
+  &:hover {
+    height: auto;
+  }
+
+  > .item {
+    height: 38px;
+    cursor: pointer;
+    letter-spacing: 2px;
+
+    &:hover {
+      background-color: #ddd;
+    }
+  }
 }
 </style>

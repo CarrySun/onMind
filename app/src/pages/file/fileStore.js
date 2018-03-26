@@ -9,15 +9,15 @@ Vue.use(Vuex)
 
 const state = {
   topBar: {
-    type: 'owner'
+    type: 'file'
   },
   leftMenu: {
-    type: 'owner'
+    type: 'file'
   },
   // FileList组件参数
   FileList: {
     pageName: '我的文件',
-    type: 'owner',
+    type: 'file',
     data: []
   }
 }

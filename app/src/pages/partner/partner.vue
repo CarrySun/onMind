@@ -1,12 +1,10 @@
 <template>
   <div>
+    <toast namespace="toastModule"></toast>
     <top-bar namespace="topBar"></top-bar>
     <div class="main">
-        <left-menu namespace="leftMenu"></left-menu>
-        <div class="right">
-            <span class="title">{{pageName}}</span>
-            <my-tabel></my-tabel>
-        </div>
+        <left-menu namespace = "leftMenu"></left-menu>
+        <file-list></file-list> 
     </div>
   </div>
 </template>
@@ -15,26 +13,23 @@
 import {} from "@/assets/js/common.js";
 import TopBar from "@/components/TopBar";
 import LeftMenu from "@/components/LeftMenu";
-import MtFooter from "@/components/Footer";
-import MyTabel from "@/components/Tabel";
+import FileList from "@/components/FileList";
+import Toast from '@/components/Toast'
 import { mapState, mapGetters } from "vuex";
 export default {
   components: {
     TopBar,
-    MtFooter,
     LeftMenu,
-    MyTabel
+    FileList,
+    Toast
   },
-  data() {
-    return {
-      pageName: '与我协作',
-    };
+  methods: {
+    loadData(){
+      this.$store.dispatch("getData");
+    }
   },
-  computed: {
+  mounted:function(){
+    this.loadData();
   }
 };
 </script>
-
-<style scoped>
-
-</style>

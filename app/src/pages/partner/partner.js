@@ -1,6 +1,6 @@
 /**
  * @file 水印识别入口js
- * @author ym3
+ * @author CarrySun
  */
 import Vue from 'vue'
 import partner from './partner.vue'

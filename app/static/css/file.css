@@ -1,0 +1,40 @@
+li {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+button {
+  width: 140px;
+}
+
+select {
+  width: 140px;
+}
+
+#layout {
+  width: 1230px;
+}
+
+#jsmind_nav {
+  width: 210px;
+  height: 600px;
+  border: solid 1px #ccc;
+  overflow: auto;
+  float: left;
+}
+
+.file_input {
+  width: 100px;
+}
+
+button.sub {
+  width: 100px;
+}
+
+#jsmind_container {
+  float: left;
+  width: 1000px;
+  height: 600px;
+  border: solid 1px #ccc;
+  background: #f4f4f4;
+}

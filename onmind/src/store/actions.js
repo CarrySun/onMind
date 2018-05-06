@@ -407,6 +407,7 @@ export default {
               });
             } else if (data.success) {
               self.fileData = data.data;
+              self.load_jsmind()
             }
           }
         })

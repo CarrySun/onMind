@@ -3,6 +3,8 @@
  * @author ym3
  */
 require("../css/common.scss");
+// require("../vendor/style/jsmind.scss");
+// @import "../../assets/vendor/style/jsmind.scss";
 
 // export default{
 

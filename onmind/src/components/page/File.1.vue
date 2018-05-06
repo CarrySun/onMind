@@ -1,35 +1,32 @@
 <template>
-  <div>
-    <!-- <el-container v-if="loading">
+<div>
+  <!-- <el-container v-if="loading">
     <el-main class="loading">
     onMind&nbsp;&nbsp;&nbsp;<i class="el-icon-loading"></i>
     </el-main>
   </el-container> -->
-    <!-- v-else -->
-    <el-container>
-      <el-header>
-        <div class="left">
-          <a class="logo" href="/">
-            <i class="el-icon-arrow-left">onMind</i>
-          </a>
-          &nbsp;&nbsp;|&nbsp;&nbsp;
-          <span @click="click" v-if="edited">{{file_title}}</span>
-          <el-form :inline-message="true" status-icon :model="reForm" ref="reForm" :rules="rules" v-else>
-            <el-form-item prop="file_title" placeholder="请输入文件名">
-              <el-input style="width:auto" v-model="reForm.file_title" placeholder="请输入内容" @keyup.enter.native="reTitle('reForm')"></el-input>
-            </el-form-item>
-            <input type="text" name="test" style="display:none" />
-          </el-form>
-        </div>
-        <div class="saveInfo">
-          {{saveInfo}}
-        </div>
-        <div class="operation">
-          <el-button type="text" @click="handleExport">
-            <i class="el-icon-download"></i>&nbsp;导出</el-button>&nbsp;&nbsp;&nbsp;|
-          <!-- <el-button type="text">
-            <i class="el-icon-document"></i>&nbsp;历史版本</el-button> -->
-          <!-- <el-dropdown trigger="click" @command="handleCommand">
+   <!-- v-else -->
+  <el-container>
+    <el-header>
+      <div class="left">
+        <a class="logo" href="/">
+          <i class="el-icon-arrow-left">onMind</i>
+        </a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span @click="click" v-if="edited">{{file_title}}</span>
+        <el-form :inline-message="true" status-icon  :model="reForm" ref="reForm" :rules="rules" v-else>
+          <el-form-item prop="file_title" placeholder="请输入文件名">
+            <el-input style="width:auto" v-model="reForm.file_title" placeholder="请输入内容" @keyup.enter.native="reTitle('reForm')"></el-input>
+          </el-form-item>
+          <input type="text" name="test" style="display:none"/>
+        </el-form>
+      </div>
+      <div class="saveInfo">
+        {{saveInfo}}
+      </div>
+      <div class="operation">
+        <el-button type="text" @click="handleExport"><i class="el-icon-download"></i>导出</el-button>
+        <!-- <el-dropdown trigger="click" @command="handleCommand">
           <span class="el-dropdown-link">
             <div class="user-logo">{{user_name.charAt(0)}}</div>
             {{user_name}}
@@ -39,23 +36,18 @@
             <el-dropdown-item command="loginout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown> -->
-        </div>
-      </el-header>
-      <el-main id="editor">
-        <div id="jsmind_container" @contextmenu="showMenu">
-          <VueContextMenu :contextMenuData="menuData" @addChild="addChild" @addBrother="addBrother" @editNode="editNode" @delNode="delNode"
-            @toggleNode="toggleNode">
-          </VueContextMenu>
-        </div>
-      </el-main>
-    </el-container>
-  </div>
+      </div>
+    </el-header>
+    <el-main id="editor">
+      <div id="jsmind_container">
+      <!-- <div id="jsmind"></div> -->
+      </div>
+    </el-main>
+  </el-container>
+</div>
 </template>
 
 <script>
-import VueContextMenu from "../common/VueContextMenu.vue";
-import key from "@/assets/vendor/js/keymaster.js";
-
 import "@/assets/vendor/js/jsmind.js";
 import "@/assets/vendor/js/jsmind.draggable.js";
 import "@/assets/vendor/js/jsmind.screenshot.js";
@@ -65,9 +57,6 @@ import { mapState, mapGetters } from "vuex";
 var jm = null;
 
 export default {
-  components: {
-    VueContextMenu: VueContextMenu
-  },
   data() {
     var validateTitleBlur = (rule, value, callback) => {
       if (!value) {
@@ -117,42 +106,6 @@ export default {
       }
     };
     return {
-      menuData: {
-        menuName: "name1",
-        axios: { x: null, y: null },
-        menulists: [
-          {
-            fnHandler: "addChild",
-            icoName: "el-icon-plus",
-            btnName: "插入子主题",
-            shortcut: "Insert"
-          },
-          {
-            fnHandler: "addBrother",
-            icoName: "el-icon-plus",
-            btnName: "插入同级主题",
-            shortcut: "Enter"
-          },
-          {
-            fnHandler: "editNode",
-            icoName: "el-icon-edit",
-            btnName: "编辑",
-            shortcut: "double-kill"
-          },
-          {
-            fnHandler: "delNode",
-            icoName: "el-icon-delete",
-            btnName: "删除",
-            shortcut: "Delete"
-          },
-          {
-            fnHandler: "toggleNode",
-            icoName: "el-icon-menu",
-            btnName: "伸展",
-            shortcut: "Space"
-          }
-        ]
-      },
       autofocus: false,
       edited: true,
       user_name: JSON.parse(localStorage.getItem("user")).user_name,
@@ -202,7 +155,7 @@ export default {
     click() {
       this.edited = !this.edited;
       if (!this.edited) {
-        this.focus();
+        this.autofocus = "autofocus";
       }
     },
     loadData() {
@@ -211,14 +164,12 @@ export default {
         decodeURI(document.location.toString()),
         "id"
       );
-      this.$store
-        .dispatch("getFileData", {
-          self: self,
-          _id: id
-        })
-        .then(data => {
-          console.log(data);
-        });
+      this.$store.dispatch("getFileData", {
+        self: self,
+        _id: id
+      }).then(data => {
+        console.log(data)
+      })
     },
     handleCommand(command) {
       if (command == "loginout") {
@@ -228,10 +179,10 @@ export default {
       }
     },
     load_jsmind() {
-      console.log(this.file_title);
+      console.log(this.file_title)
       var editor = document.getElementById("editor");
-      editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
-      editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+      editor.scrollTop = (editor.scrollHeight - editor.clientHeight)/2
+      editor.scrollLeft = (editor.scrollWidth - editor.clientWidth)/2
       var mind = {
         meta: {
           name: this.file_title,
@@ -275,103 +226,26 @@ export default {
       jm.add_node("sub2", "sub23", "new node", { "background-color": "red" });
       jm.set_node_color("sub21", "green", "#ccc");
     },
-    addEventListeners() {
-      const self = this;
-      key.setScope("issues");
-      key("command+s, ctrl+s", "issues", function() {
-        self.$message({
-          message: "保存成功",
-          type: "success"
-        });
-        return false;
-      });
-    },
-    removeEventListeners() {
-      const self = this;
-      key.deleteScope("issues");
-    },
     handleExport() {
       jm.screenshot.shootDownload();
-    },
-    get_selected_nodeid() {
-      var selected_node = jm.get_selected_node();
-      if (!!selected_node) {
-        return selected_node.id;
-      } else {
-        return null;
-      }
-    },
-    showMenu: function(event) {
-      event.preventDefault();
-      if (event.target.nodeName == "JMNODE") {
-        var x = event.clientX;
-        var y = event.clientY;
-        this.menuData.axios = {
-          x,
-          y
-        };
-      }
-    },
-    addChild() {
-      var selected_node = jm.get_selected_node(); // as parent of new node
-      if (!selected_node) {
-        prompt_info("请先选择一个节点");
-        return;
-      }
-
-      var nodeid = jsMind.util.uuid.newid();
-      var node = jm.add_node(selected_node, nodeid, "New Node");
-      jm.select_node(nodeid);
-      jm.begin_edit(nodeid);
-    },
-    addBrother() {
-      var selected_node = jm.get_selected_node();
-      if (!!selected_node && !selected_node.isroot) {
-        var nodeid = jsMind.util.uuid.newid();
-        var node = jm.insert_node_after(selected_node, nodeid, "New Node");
-        jm.select_node(nodeid);
-        jm.begin_edit(nodeid);
-      }
-    },
-
-    editNode() {
-      var selected_node = jm.get_selected_node();
-      if (!!selected_node) {
-        jm.begin_edit(selected_node);
-      }
-    },
-    delNode() {
-      var selected_id = this.get_selected_nodeid();
-      if (!selected_id) {
-        prompt_info("请先选择一个节点");
-        return;
-      }
-
-      jm.remove_node(selected_id);
-    },
-    toggleNode(e) {
-      var evt = e || event;
-      var selected_node = jm.get_selected_node();
-      if (!!selected_node) {
-        jm.toggle_node(selected_node.id);
-        evt.stopPropagation();
-        evt.preventDefault();
-      }
     }
   },
   created: function() {
     this.loadData();
   },
   mounted() {
-    this.addEventListeners();
+    this.load_jsmind();
   }
 };
 </script>
 <style scoped lang="scss">
 .el-header {
+  min-width: 1200px;
+  width: 100%;
   background-color: #393f4f;
   position: relative;
   color: #fff;
+  text-align: left;
   line-height: 45px;
   height: 45px !important;
   display: flex;
@@ -405,11 +279,8 @@ export default {
     }
   }
   .operation {
-    font-size: 14px;
+    font-size: 16px;
     color: #fff;
-    .el-button--text {
-      color: #fff;
-    }
   }
 
   .operation .el-dropdown-link {

@@ -16,18 +16,29 @@
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">添加好友</el-button>
           <el-dialog title="添加好友" :visible.sync="dialogFormVisible">
             <div style="margin-top: 15px;">
-              <el-input placeholder="" v-model="input5" class="input-with-select">
-                <el-select style="width: 130px;"  v-model="select" slot="prepend" placeholder="请选择">
+              <p class="title">请输入邮箱或用户名添加好友</p>
+              <el-input placeholder="" v-model="friend" class="input-with-select">
+                <el-select style="width: 130px;"  v-model="type" slot="prepend" placeholder="请选择">
                   <el-option label="邮箱" value="email"></el-option>
                   <el-option label="用户名" value="name"></el-option>
                 </el-select>
-                <el-button slot="append" icon="el-icon-search" style="width:100px"></el-button>
+                <el-button @click="searchFriend" slot="append" icon="el-icon-search" style="width:200px">搜索</el-button>
               </el-input>
+              <p class="title">搜索结果</p>
+              <el-card class="box-card" v-if='searchData'>
+                <div class="card-info">
+                  <div>
+                  <span>{{searchData.user_name}}</span>
+                  <span>{{searchData.user_email}}</span>
+                  </div>
+                  <el-button @click="addFriend" icon="el-icon-plus" style="float: right; padding: 3px 0" type="text">加为好友</el-button>
+                </div>
+              </el-card>
             </div>
-            <div slot="footer" class="dialog-footer">
+            <!-- <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
               <el-button type="primary" @click="release">确 定</el-button>
-            </div>
+            </div> -->
           </el-dialog>
         </div>
       </div>
@@ -82,26 +93,15 @@ export default {
       tableData: [],
       cur_page: 1,
       page_size: 6,
-      multipleSelection: [],
       select_word: "",
       dialogFormVisible: false,
-      num1: 1,
-      newFile: {
-        name: "",
-        partner: "",
-        type: ""
-      },
-      form: {
-        file_title: "",
-        file_owner: "",
-        updateTime: "",
-      },
       smallFormLabelWidth: "50px",
       formLabelWidth: "120px",
-      input3: '',
-      input4: '',
-      input5: '',
-      select: '邮箱'
+      friend: "3400840017@qq.com",
+      type: "email",
+      sending: false,
+      searching: false,
+      searchData: null
     };
   },
   created() {
@@ -122,6 +122,24 @@ export default {
     }
   },
   methods: {
+    searchFriend() {
+      var self = this;
+      this.searching = true;
+      this.$store.dispatch("searchFriend", {
+        self: self,
+        type: self.type,
+        friend: self.friend
+      });
+    },
+    addFriend() {
+      var self = this;
+      this.sending = true;
+      this.$store.dispatch("addFriend", {
+        self: self,
+        type: self.type,
+        friend: self.friend
+      });
+    },
     delTag(tag) {
       this.tags.splice(this.tags.indexOf(tag), 1);
     },
@@ -199,5 +217,13 @@ table {
     margin-left: 0px;
   }
 }
-
+.title{
+  margin: 10px 0;
+}
+.card-info{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 </style>

@@ -8,7 +8,7 @@ export default {
     var data = {};
     await apis
       .isNameRepeatApi(formdata)
-      .then(function (res) {
+      .then(function(res) {
         if (res.data) {
           data = res.data;
         }
@@ -26,7 +26,7 @@ export default {
         .verifyApi({
           user_email: formdata.user_email
         })
-        .then(function (res) {
+        .then(function(res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -44,9 +44,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '邮件发送失败，请重试',
+            message: "邮件发送失败，请重试",
             type: "error"
           });
           self.time = 0;
@@ -69,7 +69,7 @@ export default {
           user_password: formdata.user_password,
           verifyCode: formdata.verifyCode
         })
-        .then(function (res) {
+        .then(function(res) {
           self.reging = false;
           if (res.data) {
             var data = res.data;
@@ -90,9 +90,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '注册失败，请重试',
+            message: "注册失败，请重试",
             type: "error"
           });
           self.reging = false;
@@ -108,7 +108,7 @@ export default {
           user_email: formdata.user_email,
           user_password: formdata.user_password
         })
-        .then(function (res) {
+        .then(function(res) {
           self.loging = false;
           if (res.data) {
             var data = res.data;
@@ -125,9 +125,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '登陆失败，请重试',
+            message: "登陆失败，请重试",
             type: "error"
           });
           self.loging = false;
@@ -142,7 +142,7 @@ export default {
         .verifyForgetApi({
           user_email: formdata.user_email
         })
-        .then(function (res) {
+        .then(function(res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -160,9 +160,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '邮件发送失败，请重试',
+            message: "邮件发送失败，请重试",
             type: "error"
           });
           self.time = 0;
@@ -179,7 +179,7 @@ export default {
           user_password: formdata.user_password,
           verifyCode: formdata.verifyCode
         })
-        .then(function (res) {
+        .then(function(res) {
           self.forgeting = false;
           if (res.data) {
             var data = res.data;
@@ -203,9 +203,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '密码修改失败，请重试',
+            message: "密码修改失败，请重试",
             type: "error"
           });
         });
@@ -220,7 +220,7 @@ export default {
         file_title: formdata.file_title,
         accessToken: localStorage.getItem("accessToken")
       })
-      .then(function (res) {
+      .then(function(res) {
         if (res.data) {
           data = res.data;
         }
@@ -240,7 +240,7 @@ export default {
           file_partner: formdata.file_partner,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function (res) {
+        .then(function(res) {
           self.adding = false;
           if (res.data) {
             var data = res.data;
@@ -267,9 +267,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '文件新建失败，请重试',
+            message: "文件新建失败，请重试",
             type: "error"
           });
         });
@@ -284,7 +284,7 @@ export default {
           listType: formdata.listType,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function (res) {
+        .then(function(res) {
           // self.loading = false;
           if (res.data) {
             var data = res.data;
@@ -299,9 +299,9 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '文件列表获取失败，请重试',
+            message: "文件列表获取失败，请重试",
             type: "error"
           });
         });
@@ -315,7 +315,7 @@ export default {
           _id: formdata._id,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function (res) {
+        .then(function(res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -337,7 +337,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
             type: "error",
             message: "删除失败，请重试!"
@@ -347,7 +347,7 @@ export default {
   },
   async updateFileTitle({ dispatch, commit }, formdata) {
     var self = formdata.self;
-    console.log(formdata)
+    console.log(formdata);
     if (formdata._id && formdata.file_title) {
       await apis
         .updateFileApi({
@@ -355,7 +355,7 @@ export default {
           file_title: formdata.file_title,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function (res) {
+        .then(function(res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -371,15 +371,15 @@ export default {
               if (formdata.row) {
                 formdata.row.file_title = formdata.file_title;
               } else {
-                self.fileData.file_title = formdata.file_title
-                self.edited = true
-                self.saveInfo = '所有更改已保存'
+                self.fileData.file_title = formdata.file_title;
+                self.edited = true;
+                self.saveInfo = "所有更改已保存";
               }
             }
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           self.$message({
             type: "error",
             message: "重命名失败，请重试!"
@@ -396,7 +396,7 @@ export default {
           _id: formdata._id,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function (res) {
+        .then(function(res) {
           self.loading = false;
           if (res.data) {
             var data = res.data;
@@ -407,18 +407,84 @@ export default {
               });
             } else if (data.success) {
               self.fileData = data.data;
-              self.load_jsmind()
+              self.load_jsmind();
             }
           }
         })
         .catch(err => {
           self.loading = false;
-          console.log(err)
+          console.log(err);
           self.$message({
-            message: '操作失败，请重试',
+            message: "操作失败，请重试",
             type: "error"
           });
         });
     }
+  },
+  // friend
+  async searchFriend({ dispatch, commit }, formdata) {
+    var self = formdata.self;
+    await apis
+      .searchFriendApi({
+        type: formdata.type,
+        friend: formdata.friend,
+        accessToken: localStorage.getItem("accessToken")
+      })
+      .then(function(res) {
+        self.searching = false;
+        if (res.data) {
+          var data = res.data;
+          if (!data.success) {
+            self.$message({
+              message: "操作失败，请重试",
+              type: "error"
+            });
+          } else if (data.success) {
+            self.searchData = data.data
+          }
+        }
+      })
+      .catch(err => {
+        self.searching = false;
+        console.log(err);
+        self.$message({
+          message: "操作失败，请重试",
+          type: "error"
+        });
+      });
+  },
+  async addFriend({ dispatch, commit }, formdata) {
+    var self = formdata.self;
+    await apis
+      .addFriendApi({
+        type: formdata.type,
+        friend: formdata.friend,
+        accessToken: localStorage.getItem("accessToken")
+      })
+      .then(function(res) {
+        self.sending = false;
+        if (res.data) {
+          var data = res.data;
+          if (!data.success) {
+            self.$message({
+              message: "操作失败，请重试",
+              type: "error"
+            });
+          } else if (data.success) {
+             self.$message({
+               message: "已成功发送加好友请求",
+               type: "success"
+             });
+          }
+        }
+      })
+      .catch(err => {
+        self.sending = false;
+        console.log(err);
+        self.$message({
+          message: "操作失败，请重试",
+          type: "error"
+        });
+      });
   }
 };

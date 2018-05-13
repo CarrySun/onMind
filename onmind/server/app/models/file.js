@@ -7,15 +7,17 @@ const ObjectId = Schema.Types.ObjectId
 var FileSchema = new Schema({
   file_title: String,
   file_type: String,
-  file_content: String,
-  file_owner:{
+  file_details: [String],
+  file_owner: {
     type: ObjectId,
-    ref: 'User'
+    ref: "User"
   },
-  file_partner: [{
-    type: ObjectId,
-    ref: 'User'
-  }],
+  file_partner: [
+    {
+      type: ObjectId,
+      ref: "User"
+    }
+  ],
   createTime: {
     type: Date,
     default: Date.now()
@@ -24,7 +26,7 @@ var FileSchema = new Schema({
     type: Date,
     default: Date.now()
   }
-})
+});
 FileSchema.pre('save', function(next) {
   if (!this.isNew) {
     this.updateTime = Date.now()

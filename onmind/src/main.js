@@ -12,7 +12,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.auth) {
     if (to.name == 'login') {
       if (localStorage.getItem('accessToken')) {
-        next({ path: "/home"});
+        next({ path: "/owner" });
       }else {
         next();
       }

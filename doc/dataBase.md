@@ -30,7 +30,7 @@ user_friends|[ObjectId]|用户的好友
 _id|ObjectId|唯一id
 file_title|String|文件名
 file_type|String|文件类型
-file_content|String|文件内容
+file_details|String|文件内容
 file_owner|ObjectId|文件拥有者
 file_partner|[ObjectId]|文件协作者
 

@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <el-table :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column prop="file_title" label="文件名">
         </el-table-column>
         <el-table-column prop="file_type" label="文件类型">
@@ -101,6 +101,7 @@ export default {
       }
     };
     return {
+      loading: true,
       adding: false,
       tableData: [],
       multipleSelection: [],
@@ -175,7 +176,7 @@ export default {
       this.$store.dispatch("fileList", {
         listType: "file_owner",
         self: self
-      });
+      })
     },
     handleInfo(index, row) {
       let { href } = this.$router.resolve({

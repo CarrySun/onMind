@@ -10,9 +10,9 @@ exports.isTitleRepeat = async (ctx, next) => {
   var body = ctx.request.body;
   var user = ctx.session.user;
   var file = await File.find({ file_owner: user._id }).exec();
-  console.log(file)
+  console.log(file);
   if (file.length > 0) {
-    for(var i = 0; i < file.length; i ++) {
+    for (var i = 0; i < file.length; i++) {
       if (file[i].file_title == body.file_title) {
         ctx.body = {
           success: false,
@@ -30,7 +30,7 @@ exports.isTitleRepeat = async (ctx, next) => {
       success: true
     };
   }
-}
+};
 
 exports.add = async (ctx, next) => {
   var body = ctx.request.body;
@@ -72,14 +72,14 @@ exports.list = async (ctx, next) => {
   if (listType == "file_owner") {
     data = await File.find({ file_owner: user._id })
       .sort({
-        "createTime": -1
+        createTime: -1
       })
       .populate("file_owner", userFields.join(" "))
       .exec();
   } else if (listType == "file_partner") {
     data = await File.find({ file_owner: { $all: user._id } })
       .sort({
-        "createTime": -1
+        createTime: -1
       })
       .populate("file_owner", userFields.join(" "))
       .exec();
@@ -115,10 +115,14 @@ exports.update = async (ctx, next) => {
   var file = await File.findOne({ _id: body._id }).exec();
   if (file) {
     if (body.file_title) {
-      file.file_title = body.file_title
+      file.file_title = body.file_title;
+    } else if (body.file_details) {
+      file.file_details = body.file_details;
     }
+    console.log(body);
+    console.log(file)
     try {
-      file = await file.save()
+      file = await file.save();
     } catch (e) {
       console.log(e);
       ctx.body = {
@@ -133,7 +137,7 @@ exports.update = async (ctx, next) => {
   } else {
     ctx.body = {
       success: false,
-      err: '该文件不存在'
+      err: "该文件不存在"
     };
   }
 };
@@ -150,7 +154,7 @@ exports.getData = async (ctx, next) => {
   } else {
     ctx.body = {
       success: false,
-      err: '该文件不存在'
+      err: "该文件不存在"
     };
   }
-}
+};

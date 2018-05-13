@@ -23,7 +23,6 @@ const FILE_LIST = HOST + "/file/list";
 const DEL_FILE = HOST + "/file/delete";
 const UPDATE_FILE = HOST + "/file/update";
 const GET_FILEDATA = HOST + "/file/getData";
-
 const ADD_FRIEND = HOST + "/friend/addFriend";
 const SEARCH_FRIEND = HOST + "/friend/searchFriend";
 
@@ -71,6 +70,7 @@ export function updateFileApi(formData) {
   return axios.post(UPDATE_FILE, formData);
 }
 
+// friends
 export function getFileDataApi(formData) {
   return axios.post(GET_FILEDATA, formData);
 }

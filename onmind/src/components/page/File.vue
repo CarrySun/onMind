@@ -21,12 +21,14 @@
             <input type="text" name="test" style="display:none" />
           </el-form>
         </div>
-        <div class="saveInfo">
-          {{saveInfo}}
+        <div class="save">
+          {{save}}
         </div>
         <div class="operation">
           <el-button type="text" @click="handleExport">
-            <i class="el-icon-download"></i>&nbsp;导出</el-button>&nbsp;&nbsp;&nbsp;|
+            <i class="el-icon-download"></i>&nbsp;导出
+          </el-button>
+          <!-- &nbsp;&nbsp;&nbsp;| -->
           <!-- <el-button type="text">
             <i class="el-icon-document"></i>&nbsp;历史版本</el-button> -->
           <!-- <el-dropdown trigger="click" @command="handleCommand">
@@ -36,7 +38,7 @@
             <i class="el-icon-caret-bottom"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="loginout">退出登录</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown> -->
         </div>
@@ -157,7 +159,7 @@ export default {
       edited: true,
       user_name: JSON.parse(localStorage.getItem("user")).user_name,
       loading: true,
-      saveInfo: "所有更改已保存到云端",
+      save: "所有更改已保存到云端",
       fileData: {},
       reForm: {
         file_title: ""
@@ -186,7 +188,7 @@ export default {
           if (value && value === self.file_title) {
           } else if (value) {
             console.log(value);
-            self.saveInfo = "正在进行文件重命名";
+            self.save = "正在进行文件重命名";
             self.$store.dispatch("updateFileTitle", {
               self: self,
               _id: self.id,
@@ -201,9 +203,9 @@ export default {
     },
     click() {
       this.edited = !this.edited;
-      if (!this.edited) {
-        this.focus();
-      }
+      // if (!this.edited) {
+      //   this.focus();
+      // }
     },
     loadData() {
       var self = this;
@@ -213,67 +215,78 @@ export default {
       );
       this.$store
         .dispatch("getFileData", {
-          self: self,
           _id: id
         })
-        .then(data => {
-          console.log(data);
+        .then(function(res) {
+          self.loading = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.fileData = data.data;
+              self.load_jsmind();
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "操作失败，请重试",
+            type: "error"
+          });
         });
     },
     handleCommand(command) {
-      if (command == "loginout") {
+      if (command == "logout") {
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         this.$router.push("/login");
       }
     },
     load_jsmind() {
-      console.log(this.file_title);
       var editor = document.getElementById("editor");
       editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
       editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
-      var mind = {
-        meta: {
-          name: this.file_title,
-          author: "hizzgdev@163.com",
-          version: "0.2"
-        },
-        format: "node_array",
-        data: [
-          { id: "root", isroot: true, topic: "test23" },
-          {
-            id: "sub1",
-            parentid: "root",
-            topic: "sub1",
-            "background-color": "#0000ff"
+      var mind = {};
+      if (this.fileData.file_details.length > 0) {
+        mind = {
+          meta: {
+            name: this.fileData.file_title,
+            author: JSON.parse(localStorage.getItem("user")).user_name
           },
-          { id: "sub11", parentid: "sub1", topic: "sub11" },
-          { id: "sub12", parentid: "sub1", topic: "sub12" },
-          { id: "sub13", parentid: "sub1", topic: "sub13" },
-
-          { id: "sub2", parentid: "root", topic: "sub2" },
-          { id: "sub21", parentid: "sub2", topic: "sub21" },
-          {
-            id: "sub22",
-            parentid: "sub2",
-            topic: "sub22",
-            "foreground-color": "#33ff33"
+          format: "node_tree",
+          data: {
+            id: "root",
+            topic: this.fileData.file_title,
+            children: JSON.parse(this.fileData.file_details)
+          }
+        };
+      } else {
+        mind = {
+          meta: {
+            name: this.fileData.file_title,
+            author: JSON.parse(localStorage.getItem("user")).user_name
           },
-
-          { id: "sub3", parentid: "root", topic: "sub3" }
-        ]
-      };
+          format: "node_tree",
+          data: { id: "root", topic: this.fileData.file_title, children: [] }
+        };
+      }
       var options = {
         container: "jsmind_container",
         editable: true,
         theme: "primary"
       };
       jm = jsMind.show(options, mind);
+      // var mind_data = jm.get_data();
+      // console.log(mind_data);
       // jm.set_readonly(true);
-      var mind_data = jm.get_data();
-      console.log(mind_data);
-      jm.add_node("sub2", "sub23", "new node", { "background-color": "red" });
-      jm.set_node_color("sub21", "green", "#ccc");
+      // jm.add_node("sub2", "sub23", "new node", { "background-color": "red" });
+      // jm.set_node_color("sub21", "green", "#ccc");
     },
     addEventListeners() {
       const self = this;
@@ -285,6 +298,10 @@ export default {
         });
         return false;
       });
+      key("delete", "issues", function() {
+        self.delNode();
+        return false;
+      });
     },
     removeEventListeners() {
       const self = this;
@@ -292,6 +309,19 @@ export default {
     },
     handleExport() {
       jm.screenshot.shootDownload();
+    },
+    saveDetails(jm) {
+      console.log(jm);
+      var self = this;
+      this.save = "更改正在保存";
+      this.$store
+        .dispatch("updateDetails", {
+          _id: self.id,
+          file_details: JSON.stringify(jm.data.children)
+        })
+        .then(res => {
+          self.save = "所有更改已保存到云端";
+        });
     },
     get_selected_nodeid() {
       var selected_node = jm.get_selected_node();
@@ -312,15 +342,16 @@ export default {
         };
       }
     },
-    addChild() {
+    async addChild() {
       var selected_node = jm.get_selected_node(); // as parent of new node
       if (!selected_node) {
-        prompt_info("请先选择一个节点");
+        this.$message("请先选择一个节点");
         return;
       }
 
       var nodeid = jsMind.util.uuid.newid();
-      var node = jm.add_node(selected_node, nodeid, "New Node");
+      var node = jm.add_node(selected_node, nodeid, "新增主题");
+      this.saveDetails(jm.get_data());
       jm.select_node(nodeid);
       jm.begin_edit(nodeid);
     },
@@ -328,13 +359,14 @@ export default {
       var selected_node = jm.get_selected_node();
       if (!!selected_node && !selected_node.isroot) {
         var nodeid = jsMind.util.uuid.newid();
-        var node = jm.insert_node_after(selected_node, nodeid, "New Node");
+        var node = jm.insert_node_after(selected_node, nodeid, "新增主题");
+        this.saveDetails(jm.get_data());
         jm.select_node(nodeid);
         jm.begin_edit(nodeid);
       }
     },
-
     editNode() {
+      console.log("edit");
       var selected_node = jm.get_selected_node();
       if (!!selected_node) {
         jm.begin_edit(selected_node);
@@ -343,11 +375,12 @@ export default {
     delNode() {
       var selected_id = this.get_selected_nodeid();
       if (!selected_id) {
-        prompt_info("请先选择一个节点");
+        this.$message("请先选择一个节点");
         return;
       }
 
       jm.remove_node(selected_id);
+      this.saveDetails(jm.get_data());
     },
     toggleNode(e) {
       var evt = e || event;
@@ -385,7 +418,7 @@ export default {
       color: #fff;
     }
   }
-  .saveInfo {
+  .save {
     position: absolute;
     width: 200px;
     text-align: center;

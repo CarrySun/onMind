@@ -14,7 +14,7 @@
     // library version
     var __version__ = '0.4.6';
     // author
-    var __author__ = 'hizzgdev@163.com';
+    var __author__ = 'carrysun2018@163.com';
 
     // an noop function define
     var _noop = function(){};
@@ -1412,6 +1412,7 @@
         },
 
         update_node:function(nodeid, topic){
+          console.log('update')
             if(this.get_editable()){
                 if(jm.util.text.is_empty(topic)){
                     logger.warn('fail, topic can not be empty');

@@ -11,8 +11,8 @@ export default new Router({
       redirect: "/login"
     },
     {
-      path: "/home",
-      name: "home",
+      path: "/owner",
+      name: "owner",
       component: resolve => require(["../components/common/Home.vue"], resolve),
       children: [
         {
@@ -22,13 +22,13 @@ export default new Router({
             require(["../components/page/Owner.vue"], resolve),
           meta: { auth: true }
         },
-        {
-          path: "/owner",
-          name: "owner",
-          component: resolve =>
-            require(["../components/page/Owner.vue"], resolve),
-          meta: { auth: true }
-        },
+        // {
+        //   path: "/owner",
+        //   name: "owner",
+        //   component: resolve =>
+        //     require(["../components/page/Owner.vue"], resolve),
+        //   meta: { auth: true }
+        // },
         {
           path: "/partner",
           name: "partner",

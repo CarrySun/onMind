@@ -85,7 +85,7 @@ export default {
               });
               localStorage.setItem("user", JSON.stringify(data.user));
               localStorage.setItem("accessToken", data.user.accessToken);
-              self.$router.push("/home");
+              self.$router.push("/owner");
             }
           }
         })
@@ -120,7 +120,7 @@ export default {
             } else if (data.success) {
               localStorage.setItem("user", JSON.stringify(data.user));
               localStorage.setItem("accessToken", data.user.accessToken);
-              self.$router.push("/home");
+              self.$router.push("/owner");
             }
           }
         })
@@ -285,7 +285,7 @@ export default {
           accessToken: localStorage.getItem("accessToken")
         })
         .then(function(res) {
-          // self.loading = false;
+          self.loading = false;
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -299,6 +299,7 @@ export default {
           }
         })
         .catch(err => {
+          self.loading = false;
           console.log(err);
           self.$message({
             message: "文件列表获取失败，请重试",
@@ -389,37 +390,19 @@ export default {
   },
   //file
   async getFileData({ dispatch, commit }, formdata) {
-    var self = formdata.self;
     if (formdata._id) {
-      await apis
-        .getFileDataApi({
-          _id: formdata._id,
-          accessToken: localStorage.getItem("accessToken")
-        })
-        .then(function(res) {
-          self.loading = false;
-          if (res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              self.fileData = data.data;
-              self.load_jsmind();
-            }
-          }
-        })
-        .catch(err => {
-          self.loading = false;
-          console.log(err);
-          self.$message({
-            message: "操作失败，请重试",
-            type: "error"
-          });
-        });
+      return await apis.getFileDataApi({
+        _id: formdata._id,
+        accessToken: localStorage.getItem("accessToken")
+      });
     }
+  },
+  async updateDetails({ dispatch, commit }, formdata) {
+    return await apis.updateFileApi({
+      _id: formdata._id,
+      file_details: formdata.file_details,
+      accessToken: localStorage.getItem("accessToken")
+    });
   },
   // friend
   async searchFriend({ dispatch, commit }, formdata) {
@@ -440,7 +423,7 @@ export default {
               type: "error"
             });
           } else if (data.success) {
-            self.searchData = data.data
+            self.searchData = data.data;
           }
         }
       })
@@ -471,10 +454,10 @@ export default {
               type: "error"
             });
           } else if (data.success) {
-             self.$message({
-               message: "已成功发送加好友请求",
-               type: "success"
-             });
+            self.$message({
+              message: "已成功发送加好友请求",
+              type: "success"
+            });
           }
         }
       })

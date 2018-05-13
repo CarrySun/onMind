@@ -33,7 +33,7 @@
             <i class="el-icon-caret-bottom"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="loginout">退出登录</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown> -->
       </div>
@@ -172,7 +172,7 @@ export default {
       })
     },
     handleCommand(command) {
-      if (command == "loginout") {
+      if (command == "logout") {
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         this.$router.push("/login");

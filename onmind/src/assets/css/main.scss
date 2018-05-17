@@ -1,65 +1,76 @@
-*{margin:0;padding:0;}
-html,body,#app,.wrapper{
-    width:100%;
-    height:100%;
-    overflow: hidden;
+* {
+  margin: 0;
+  padding: 0;
 }
-body{
-    font-family:"Helvetica Neue",Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+html,
+body,
+#app,
+.wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi,
+    sans-serif;
 
-    font-size: 14px;
+  font-size: 14px;
 }
-a{text-decoration: none}
-.content{
-    // background: none repeat scroll 0 0 #fff;
-    position: absolute;
-    left: 200px;
-    right: 0;
-    top: 50px;
-    bottom:0;
-    width: auto;
-    min-width: 1000px;
-    padding:20px;
-    box-sizing: border-box;
-    overflow-y: scroll;
+a {
+  text-decoration: none;
+}
+.content {
+  // background: none repeat scroll 0 0 #fff;
+  position: absolute;
+  left: 200px;
+  right: 0;
+  top: 50px;
+  bottom: 0;
+  width: auto;
+  min-width: 1000px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: scroll;
 }
 /*添加好友*/
 .input-with-select .el-input-group__prepend {
   background-color: #fff;
 }
-.el-menu-item:hover{
+.el-menu-item:hover {
   background: none;
 }
-.el-menu-item.is-active{
+.el-menu-item.is-active {
   background: none;
 }
-.crumbs{
-    margin-bottom: 20px;
+.crumbs {
+  margin-bottom: 20px;
 }
-.pagination{
-    margin: 20px 0;
-    text-align: right;
+.pagination {
+  margin: 20px 0;
+  text-align: right;
 }
-.plugins-tips{
-    padding:20px 10px;
-    margin-bottom: 20px;
+.plugins-tips {
+  padding: 20px 10px;
+  margin-bottom: 20px;
 }
-.el-button+.el-tooltip {
-    margin-left: 10px;
-}
-
-.el-table tr:hover{
-    background: #f6faff;
-}
-.mgb20{
-    margin-bottom: 20px;
+.el-button + .el-tooltip {
+  margin-left: 10px;
 }
 
-.move-enter-active,.move-leave-active{
-    transition: opacity .5s;
+.el-table tr:hover {
+  background: #f6faff;
 }
-.move-enter,.move-leave{
-    opacity: 0;
+.mgb20 {
+  margin-bottom: 20px;
+}
+
+.move-enter-active,
+.move-leave-active {
+  transition: opacity 0.5s;
+}
+.move-enter,
+.move-leave {
+  opacity: 0;
 }
 /* table-expand */
 .demo-table-expand {
@@ -76,32 +87,32 @@ a{text-decoration: none}
   margin-bottom: 0;
   width: 50%;
 }
-.el-table th>.cell{
+.el-table th > .cell {
   text-align: center;
 }
 
 /*.tagManage{ */
-  .el-tree-node__content {
-    padding: 5px;
-  }
-  .el-button--text {
-    font-weight: 400;
-    font-size: 16px;
-  }
+.el-tree-node__content {
+  padding: 5px;
+}
+.el-button--text {
+  font-weight: 400;
+  font-size: 16px;
+}
 /* }*/
-.el-table__body-wrapper{
+.el-table__body-wrapper {
   // min-height: 314px!important;
-
 }
 .el-col {
   // margin-bottom: 20px;
   // border-radius: 4px;
 }
-.el-input-group__append{
-  padding:0 5px;
+.el-input-group__append {
+  padding: 0 5px;
 }
 
-.el-table td, .el-table th{
+.el-table td,
+.el-table th {
   padding: 10px 0;
 }
 
@@ -116,7 +127,12 @@ a{text-decoration: none}
   display: none;
 }
 
+.input .el-input__inner {
+  padding-right: 70px;
+}
 
-.input .el-input__inner{
-  padding-right:70px
+.el-badge__content.is-fixed {
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }

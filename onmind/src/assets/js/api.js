@@ -26,6 +26,8 @@ const GET_FILEDATA = HOST + "/file/getData";
 const ADD_FRIEND = HOST + "/friend/addFriend";
 const SEARCH_FRIEND = HOST + "/friend/searchFriend";
 
+const NOTICE_LIST = HOST + "/notice/list";
+const UPDATE_NOTICE = HOST + "/notice/update";
 export function isNameRepeatApi(formData) {
   return axios.post(IS_NAME_REPEAT, formData);
 }
@@ -80,4 +82,11 @@ export function addFriendApi(formData) {
 }
 export function searchFriendApi(formData) {
   return axios.post(SEARCH_FRIEND, formData);
+}
+//notive
+export function noticeListApi(formData) {
+  return axios.post(NOTICE_LIST, formData);
+}
+export function updateNoticeApi(formData) {
+  return axios.post(UPDATE_NOTICE, formData);
 }

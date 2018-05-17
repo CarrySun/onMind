@@ -5,7 +5,7 @@ var App = require("../app/controllers/app");
 var User = require("../app/controllers/user");
 var File = require("../app/controllers/file");
 var Friend = require("../app/controllers/friend");
-
+var Notice = require("../app/controllers/notice");
 module.exports = function() {
   var router = new Router({
     prefix: "/api"
@@ -44,5 +44,9 @@ module.exports = function() {
     Friend.searchFriend
   );
   router.post("/friend/addFriend", App.hasBody, App.hasToken, Friend.addFriend);
+
+
+  //notive
+  router.post("/notice/list", App.hasBody, App.hasToken, Notice.list);
   return router;
 };

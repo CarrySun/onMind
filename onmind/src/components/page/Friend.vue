@@ -66,7 +66,7 @@
         </el-table-column> -->
         <el-table-column label="操作" width="310">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleUpload(scope.$index, scope.row)">浏览</el-button>
+            <!-- <el-button size="mini" @click="handleUpload(scope.$index, scope.row)">浏览</el-button> -->
             <el-button size="mini" @click="handleUpload(scope.$index, scope.row)">与他协作</el-button>
             <el-button size="mini" type="danger" @click="handleExport(scope.$index, scope.row)">删除</el-button>
           </template>

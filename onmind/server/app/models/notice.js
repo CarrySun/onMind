@@ -4,20 +4,20 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 var NoticeSchema = new Schema({
-  fromUser: [
-    {
-      type: ObjectId,
-      ref: "User"
-    }
-  ],
-  toUser: [
-    {
-      type: ObjectId,
-      ref: "User"
-    }
-  ],
+  fromUser: {
+    type: ObjectId,
+    ref: "User"
+  },
+  toUser: {
+    type: ObjectId,
+    ref: "User"
+  },
   type: String,
   content: String,
+  readed: {
+    type: Boolean,
+    default: false
+  },
   agreed: {
     type: Boolean,
     default: false

@@ -469,5 +469,14 @@ export default {
           type: "error"
         });
       });
+  },
+
+  async noticeList({}, formdata) {
+    return await apis.noticeListApi({
+      accessToken: localStorage.getItem("accessToken")
+    });
+  },
+  async updateNotice({}, formdata) {
+    return await apis.updateNoticeApi(formdata);
   }
 };

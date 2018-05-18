@@ -196,7 +196,7 @@
 
   .badge {
     position: absolute;
-    right: 200px;
+    right: 160px;
     top: 5px;
   }
 </style>

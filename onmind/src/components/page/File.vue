@@ -219,7 +219,7 @@ export default {
         })
         .then(function(res) {
           self.loading = false;
-          if (res.data) {
+          if (res && res.data) {
             var data = res.data;
             if (!data.success) {
               self.$message({

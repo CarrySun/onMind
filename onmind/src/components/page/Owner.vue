@@ -16,7 +16,7 @@
           <el-dialog title="新建文件" :visible.sync="dialogFormVisible" width = "40%">
             <el-form  :rules="rules" ref="newFile" :model="newFile">
               <el-form-item label="文件名" prop="file_title" :label-width="formLabelWidth" placeholder="请输入文件名">
-                <el-input v-model="newFile.file_title" auto-complete="off" style="width:80%"></el-input>
+                <el-input autofocus="autofocus" v-model="newFile.file_title" auto-complete="off" style="width:80%"></el-input>
               </el-form-item>
               <el-form-item label="文件类型" prop="file_type" :label-width="formLabelWidth">
                 <el-select v-model="newFile.file_type" placeholder="请选择文件类型" style="width: 80%;">
@@ -110,7 +110,7 @@ export default {
       newFile: {
         file_title: "",
         file_partner: "",
-        file_type: ""
+        file_type: "mind"
       },
       form: {
         file_title: "",

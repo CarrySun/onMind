@@ -259,7 +259,7 @@ export default {
               let { href } = self.$router.resolve({
                 name: "file",
                 query: {
-                  id: data._id
+                  id: data.file._id
                 }
               });
               window.open(href, "_blank");

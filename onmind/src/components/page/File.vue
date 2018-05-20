@@ -292,14 +292,12 @@ export default {
       const self = this;
       key.setScope("issues");
       key("command+s, ctrl+s", "issues", function() {
-        self.$message({
-          message: "保存成功",
-          type: "success"
-        });
+        self.saveDetails(jm.get_data());
         return false;
       });
       key("delete", "issues", function() {
         self.delNode();
+        // self.saveDetails(jm)
         return false;
       });
     },
@@ -311,7 +309,6 @@ export default {
       jm.screenshot.shootDownload();
     },
     saveDetails(jm) {
-      console.log(jm);
       var self = this;
       this.save = "更改正在保存";
       this.$store
@@ -351,7 +348,7 @@ export default {
 
       var nodeid = jsMind.util.uuid.newid();
       var node = jm.add_node(selected_node, nodeid, "新增主题");
-      this.saveDetails(jm.get_data());
+      // this.saveDetails(jm.get_data());
       jm.select_node(nodeid);
       jm.begin_edit(nodeid);
     },
@@ -360,7 +357,7 @@ export default {
       if (!!selected_node && !selected_node.isroot) {
         var nodeid = jsMind.util.uuid.newid();
         var node = jm.insert_node_after(selected_node, nodeid, "新增主题");
-        this.saveDetails(jm.get_data());
+        // this.saveDetails(jm.get_data());
         jm.select_node(nodeid);
         jm.begin_edit(nodeid);
       }
@@ -380,7 +377,7 @@ export default {
       }
 
       jm.remove_node(selected_id);
-      this.saveDetails(jm.get_data());
+      // this.saveDetails(jm.get_data());
     },
     toggleNode(e) {
       var evt = e || event;

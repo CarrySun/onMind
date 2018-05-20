@@ -4,7 +4,6 @@
       <i>onMind</i>
     </div>
     <div class="user-info">
-
       <el-popover placement="bottom" width="350" trigger="click">
         <ul v-if="total" class="hasData">
           <li v-for="(item,index) in notice" :key="index">
@@ -26,17 +25,8 @@
                 </div>
               </div>
             </template>
-            <template v-else-if="item.type == 'agreeFriend'">
+            <template v-if="item.type == 'agreeFriend'">
               <span class="noticeContent" v-if="item.agreed == 2"> {{item.fromUser.user_name}} 同意了您的好友请求</span>
-              <div class="listInfo">
-                <div class="time">
-                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
-                </div>
-              </div>
-            </template>
-            <template v-else-if="item.type == 'addPartner'">
-              <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
-              <div class="fileTitle" @click="handleInfo(item.content)">{{item.content.file_title}}</div>
               <div class="listInfo">
                 <div class="time">
                   {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
@@ -48,11 +38,13 @@
         <div v-else class="noData">
           <p>暂无通知</p>
         </div>
-        <i slot="reference" class="icon el-icon-bell"></i>
+        <el-badge :value="total" slot="reference" class="badge">
+          <!-- <el-button size="small"><i class="icon el-icon-bell"></i></el-button> -->
+          <i class="icon el-icon-bell"></i>
+        </el-badge>
       </el-popover>
-
       <el-dropdown trigger="click" @command="handleCommand">
-        <span class="el-dropdown-link"  style="line-height: 48px;">
+        <span class="el-dropdown-link">
           <div class="user-logo">{{user_name.charAt(0)}}</div>
           {{user_name}}
           <i class="el-icon-caret-bottom"></i>
@@ -61,7 +53,6 @@
           <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-
     </div>
   </div>
 </template>
@@ -85,24 +76,14 @@ export default {
   },
   mounted() {},
   methods: {
-    handleInfo(content) {
-      console.log(123)
-      let { href } = this.$router.resolve({
-        name: "file",
-        query: {
-          id: content._id
-        }
-      });
-      window.open(href, "_blank");
-    },
-    agreeFriend(item, index, agreed) {
+    agreeFriend(item, index,agreed) {
       this.$store.dispatch("updateNotice", {
         item: item,
         index: index,
         from_id: item.fromUser._id,
         type: item.type,
         _id: item._id,
-        agreed: agreed
+        agreed: agreed,
       });
     },
     handleClick(type, event) {
@@ -125,22 +106,6 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.header {
-  min-width: 1200px;
-  width: 100%;
-  height: 50px;
-  font-size: 22px;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header .logo {
-  margin-left: 70px;
-  text-align: center;
-}
-
 .listInfo {
   display: flex;
   justify-content: space-between;
@@ -163,11 +128,6 @@ export default {
   .noticeContent {
     font-size: 16px;
   }
-  .fileTitle{
-    font-size: 20px;
-    cursor: pointer;
-    color: #409EFF;
-  }
 }
 
 .noData {
@@ -176,14 +136,28 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
+.header {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  font-size: 22px;
+  line-height: 50px;
+  color: #fff;
+}
+
+.header .logo {
+  float: left;
+  width: 258px;
+  text-align: center;
+}
+
 .user-info {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  float: right;
+  padding-right: 50px;
   font-size: 16px;
   color: #fff;
-  margin-right: 40px;
 }
 
 .user-info .el-dropdown-link {
@@ -215,6 +189,11 @@ export default {
   font-size: 30px;
   font-weight: bolder;
   cursor: pointer;
-  padding-right: 20px;
+}
+
+.badge {
+  position: absolute;
+  right: 160px;
+  top: 5px;
 }
 </style>

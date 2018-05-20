@@ -2,32 +2,96 @@
 
 var mongoose = require("mongoose");
 var Notice = mongoose.model("Notice");
+var Friend = mongoose.model("Friend");
 var User = mongoose.model("User");
 
 var userFields = ["_id", "user_name", "user_email"];
+var fileFields = ["_id", "file_title"];
 
 exports.list = async (ctx, next) => {
   var user = ctx.session.user;
-  var data = [];
-  var readed = await Notice.find({ toUser: user._id, readed: true })
+  var notice = await Notice.find({ toUser: user._id })
     .sort({
       createTime: -1
     })
     .populate("fromUser", userFields.join(" "))
-    .exec();
-  var unread = await Notice.find({ toUser: user._id, readed: false })
-    .sort({
-      createTime: -1
-    })
-    .populate("fromUser", userFields.join(" "))
+    .populate("content", fileFields.join(" "))
     .exec();
   ctx.body = {
     success: true,
-    data: { readed: readed, unread: unread },
-    total: { readed: readed.length, unread: unread.length }
+    data: notice,
+    total: notice.length
   };
 };
-
+exports.update = async (ctx, next) => {
+  var body = ctx.request.body;
+  var user = ctx.session.user;
+  var notice = await Notice.findOne({ _id: body._id }).exec();
+  if (notice) {
+    if (body.type == 'addFriend') {
+      notice.agreed = body.agreed;
+      //同意 添加好友
+      if (body.agreed == 2) {
+        var friend = new Friend({
+          answer_id: user._id,
+          ask_id: body.from_id
+        })
+        try {
+          friend = await friend.save();
+          try {
+            notice = await notice.save();
+          } catch (e) {
+            console.log(e);
+            ctx.body = {
+              success: false,
+              err: e
+            };
+            return next;
+          }
+        } catch (e) {
+          console.log(e);
+          ctx.body = {
+            success: false,
+            err: e
+          };
+          return next;
+        }
+      }
+      //同意或拒绝 通知请求方
+      var newNotice = new Notice({
+        toUser: body.from_id,
+        fromUser: user._id,
+        type: "agreeFriend",
+        agreed: body.agreed
+      })
+      try {
+        newNotice = await newNotice.save();
+      } catch (e) {
+        console.log(e);
+        ctx.body = {
+          success: false,
+          err: e
+        };
+        return next;
+      }
+    }
+    friend = await Friend.findOne({ _id: friend._id })
+      .populate("answer_id", userFields.join(" "))
+      .populate("ask_id", userFields.join(" "))
+    ctx.body = {
+      data: {
+        friend: friend,
+        notice: notice
+      },
+      success: true
+    };
+  } else {
+    ctx.body = {
+      success: false,
+      err: "该文件不存在"
+    };
+  }
+};
 // exports.add = async (ctx, next) => {
 //   var body = ctx.request.body;
 //   var user = ctx.session.user;
@@ -79,38 +143,7 @@ exports.list = async (ctx, next) => {
 //     success: true
 //   };
 // };
-// exports.update = async (ctx, next) => {
-//   var body = ctx.request.body;
-//   var user = ctx.session.user;
-//   var file = await Notice.findOne({ _id: body._id }).exec();
-//   if (file) {
-//     if (body.file_title) {
-//       file.file_title = body.file_title;
-//     } else if (body.file_details) {
-//       file.file_details = body.file_details;
-//     }
-//     console.log(body);
-//     console.log(file);
-//     try {
-//       file = await file.save();
-//     } catch (e) {
-//       console.log(e);
-//       ctx.body = {
-//         success: false,
-//         err: e
-//       };
-//       return next;
-//     }
-//     ctx.body = {
-//       success: true
-//     };
-//   } else {
-//     ctx.body = {
-//       success: false,
-//       err: "该文件不存在"
-//     };
-//   }
-// };
+
 
 // exports.getData = async (ctx, next) => {
 //   var body = ctx.request.body;

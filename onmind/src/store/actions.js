@@ -8,7 +8,7 @@ export default {
     var data = {};
     await apis
       .isNameRepeatApi(formdata)
-      .then(function(res) {
+      .then(function (res) {
         if (res.data) {
           data = res.data;
         }
@@ -26,7 +26,7 @@ export default {
         .verifyApi({
           user_email: formdata.user_email
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -69,7 +69,7 @@ export default {
           user_password: formdata.user_password,
           verifyCode: formdata.verifyCode
         })
-        .then(function(res) {
+        .then(function (res) {
           self.reging = false;
           if (res.data) {
             var data = res.data;
@@ -108,7 +108,7 @@ export default {
           user_email: formdata.user_email,
           user_password: formdata.user_password
         })
-        .then(function(res) {
+        .then(function (res) {
           self.loging = false;
           if (res.data) {
             var data = res.data;
@@ -142,7 +142,7 @@ export default {
         .verifyForgetApi({
           user_email: formdata.user_email
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -179,7 +179,7 @@ export default {
           user_password: formdata.user_password,
           verifyCode: formdata.verifyCode
         })
-        .then(function(res) {
+        .then(function (res) {
           self.forgeting = false;
           if (res.data) {
             var data = res.data;
@@ -220,7 +220,7 @@ export default {
         file_title: formdata.file_title,
         accessToken: localStorage.getItem("accessToken")
       })
-      .then(function(res) {
+      .then(function (res) {
         if (res.data) {
           data = res.data;
         }
@@ -231,6 +231,8 @@ export default {
     return data;
   },
   async addFile({ dispatch, commit }, formdata) {
+    console.log('addFile')
+    console.log(formdata)
     var self = formdata.self;
     if (formdata.file_title && formdata.file_type) {
       await apis
@@ -240,7 +242,8 @@ export default {
           file_partner: formdata.file_partner,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
+        .then(function (res) {
+          self.cancel()
           self.adding = false;
           if (res.data) {
             var data = res.data;
@@ -255,8 +258,8 @@ export default {
                 type: "success"
               });
               self.tableData.unshift(data.file);
-              self.dialogFormVisible = false;
-              let { href } = self.$router.resolve({
+          self.dialogFormVisible = false;
+          let { href } = self.$router.resolve({
                 name: "file",
                 query: {
                   id: data.file._id
@@ -284,7 +287,7 @@ export default {
           listType: formdata.listType,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
+        .then(function (res) {
           self.loading = false;
           if (res.data) {
             var data = res.data;
@@ -308,6 +311,49 @@ export default {
         });
     }
   },
+  async quitPartner({ dispatch, commit }, formdata) {
+    var self = formdata.self;
+    if (formdata._id) {
+      await apis
+        .quitPartnerApi({
+          _id: formdata._id,
+          accessToken: localStorage.getItem("accessToken")
+        })
+        .then(function (res) {
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+              var data = self.tableData
+              var old = data[formdata.index].file_partner
+              var user = JSON.parse(localStorage.getItem("user"));
+              old = common.removeByValue(
+                old,
+                "user_name",
+                user.user_name
+              );
+              data[formdata.index].file_partner = old
+              self.tableData = data.concat()
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          self.$message({
+            type: "error",
+            message: "删除失败，请重试!"
+          });
+        });
+    }
+  },
   async delFile({ dispatch, commit }, formdata) {
     var self = formdata.self;
     if (formdata._id) {
@@ -316,7 +362,7 @@ export default {
           _id: formdata._id,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -346,9 +392,46 @@ export default {
         });
     }
   },
+  
+  async updateFilePartner({ dispatch, commit }, formdata) {
+    console.log(formdata)
+    var self = formdata.self;
+    if (formdata._id && formdata.file_partner) {
+      await apis
+        .updateFileApi({
+          _id: formdata._id,
+          file_partner: formdata.file_partner,
+          accessToken: localStorage.getItem("accessToken")
+        })
+        .then(function (res) {
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.dialogPartnerVisible = false
+              // var data = self.tableData.concat()
+              // data[formdata.index].file_partner = formdata.file_partner.concat()
+              // self.tableData = data.concat()
+              self.tableData[formdata.index].file_partner = data.data.file_partner.concat()
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          self.$message({
+            type: "error",
+            message: "操作失败，请重试!"
+          });
+        });
+    }
+  },
   async updateFileTitle({ dispatch, commit }, formdata) {
     var self = formdata.self;
-    console.log(formdata);
+    // console.log(formdata);
     if (formdata._id && formdata.file_title) {
       await apis
         .updateFileApi({
@@ -356,7 +439,7 @@ export default {
           file_title: formdata.file_title,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.data) {
             var data = res.data;
             if (!data.success) {
@@ -405,6 +488,36 @@ export default {
     });
   },
   // friend
+  async friendList({ dispatch, commit }, formdata) {
+    commit(types.NULL_FRIEND)
+    var self = formdata.self
+    await apis.friendListApi({
+      accessToken: localStorage.getItem("accessToken")
+    })
+      .then(res => {
+        self.loading = false;
+        if (res.data.success) {
+          var data = res.data.data;
+          for (var i in data) {
+            commit(types.ADD_FRIEND, data[i])
+          }
+        } else {
+          self.$message({
+            type: "error",
+            message: "好友列表获取失败"
+          });
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        self.loading = false;
+        self.$message({
+          type: "error",
+          message: "好友列表获取失败"
+        });
+      });
+  },
+
   async searchFriend({ dispatch, commit }, formdata) {
     var self = formdata.self;
     await apis
@@ -413,7 +526,7 @@ export default {
         friend: formdata.friend,
         accessToken: localStorage.getItem("accessToken")
       })
-      .then(function(res) {
+      .then(function (res) {
         self.searching = false;
         if (res.data) {
           var data = res.data;
@@ -444,7 +557,7 @@ export default {
         friend: formdata.friend,
         accessToken: localStorage.getItem("accessToken")
       })
-      .then(function(res) {
+      .then(function (res) {
         self.sending = false;
         if (res.data) {
           var data = res.data;
@@ -470,13 +583,86 @@ export default {
         });
       });
   },
-
-  async noticeList({}, formdata) {
-    return await apis.noticeListApi({
-      accessToken: localStorage.getItem("accessToken")
-    });
+  async delFriend({ dispatch, commit }, formdata) {
+    var self = formdata.self;
+    await apis
+      .delFriendApi({
+        _id: formdata._id,
+        accessToken: localStorage.getItem("accessToken")
+      })
+      .then(function (res) {
+        if (res.data) {
+          var data = res.data;
+          if (!data.success) {
+            console.log(data.err)
+            self.$message({
+              message: "删除失败，请重试!",
+              type: "error"
+            });
+          } else if (data.success) {
+            self.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            commit(types.DEL_FRIEND, formdata.index)
+          }
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        self.$message({
+          type: "error",
+          message: "删除失败，请重试!"
+        });
+      });
   },
-  async updateNotice({}, formdata) {
-    return await apis.updateNoticeApi(formdata);
+
+  async noticeList({ dispatch, commit }, formdata) {
+    var self = formdata.self
+    await apis.noticeListApi({
+      accessToken: localStorage.getItem("accessToken")
+    }).then(res => {
+      self.loading = false
+      if (res.data.success) {
+        commit(types.SET_NOTICE, res.data.data)
+      } else {
+        console.log(res.data.error)
+        self.$message({
+          message: "操作失败，请重试",
+          type: "error"
+        });
+      }
+    })
+      .catch(err => {
+        self.loading = false;
+        console.log(err);
+        self.$message({
+          message: "操作失败，请重试",
+          type: "error"
+        });
+      });
+  },
+  async updateNotice({ dispatch, commit }, formdata) {
+    // console.log(formdata)
+    var data = {
+      from_id: formdata.from_id,
+      type: formdata.type,
+      _id: formdata._id,
+      agreed: formdata.agreed,
+      accessToken: localStorage.getItem("accessToken")
+    }
+
+    await apis.updateNoticeApi(data).then(res => {
+      if (res.data.success) {
+        commit(types.ADD_FRIEND, res.data.data.friend)
+        var item = common.cloneObj(formdata.item)
+        item.agreed = formdata.agreed
+        var res = {
+          index: formdata.index,
+          notice: item
+        }
+        commit(types.UPDATE_NOTICE, res)
+      }
+    })
   }
 };

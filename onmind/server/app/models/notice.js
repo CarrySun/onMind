@@ -13,14 +13,13 @@ var NoticeSchema = new Schema({
     ref: "User"
   },
   type: String,
-  content: String,
-  readed: {
-    type: Boolean,
-    default: false
+  content: {
+    type: ObjectId,
+    ref: "File"
   },
-  agreed: {
-    type: Boolean,
-    default: false
+  agreed: {//1, 2, 3
+    type: Number,
+    default: 1
   },
   createTime: {
     type: Date,

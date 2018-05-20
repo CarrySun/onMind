@@ -13,6 +13,8 @@ const state = {
     type: '',
     data: []
   },
+  friend:[],
+  notice:[]
 }
 
 export default state

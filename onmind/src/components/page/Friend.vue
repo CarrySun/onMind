@@ -10,15 +10,15 @@
       </div>
       <div class="handle-box">
         <div style="position:relative; margin-right:20px">
-          <el-input v-model="select_word" prefix-icon="el-icon-search" placeholder="" class="handle-input mr10"></el-input>
+          <el-input v-model="select_word" prefix-icon="el-icon-search" placeholder="请输入用户名或邮箱" class="handle-input mr10"></el-input>
         </div>
         <div>
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">添加好友</el-button>
           <el-dialog title="添加好友" :visible.sync="dialogFormVisible">
             <div style="margin-top: 15px;">
               <p class="title">请输入邮箱或用户名添加好友</p>
-              <el-input placeholder="" v-model="friend" class="input-with-select">
-                <el-select style="width: 130px;"  v-model="type" slot="prepend" placeholder="请选择">
+              <el-input placeholder="" v-model="friendName" class="input-with-select">
+                <el-select style="width: 130px;" v-model="type" slot="prepend" placeholder="请选择">
                   <el-option label="邮箱" value="email"></el-option>
                   <el-option label="用户名" value="name"></el-option>
                 </el-select>
@@ -28,8 +28,8 @@
               <el-card class="box-card" v-if='searchData'>
                 <div class="card-info">
                   <div>
-                  <span>{{searchData.user_name}}</span>
-                  <span>{{searchData.user_email}}</span>
+                    <span>{{searchData.user_name}}</span>
+                    <span>{{searchData.user_email}}</span>
                   </div>
                   <el-button @click="addFriend" icon="el-icon-plus" style="float: right; padding: 3px 0" type="text">加为好友</el-button>
                 </div>
@@ -40,40 +40,34 @@
               <el-button type="primary" @click="release">确 定</el-button>
             </div> -->
           </el-dialog>
+          <el-dialog title="选择要与他协作的文件" :visible.sync="dialogPartnerVisible" width="40%">
+            <div>
+              <el-checkbox-group v-model="checked" size="medium">
+                <el-checkbox v-for="(item,index) in tableData" :key="index" :name="item._id" :label="item.file_title" border></el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="cancel">取 消</el-button>
+              <el-button type="primary" @click="submit">确 定</el-button>
+            </div>
+          </el-dialog>
         </div>
       </div>
 
-      <el-table :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
-        <el-table-column prop="name" label="用户名">
+      <el-table v-loading="loading" :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
+        <el-table-column prop="user_name" label="用户名">
         </el-table-column>
-        <el-table-column prop="email" label="邮箱">
+        <el-table-column prop="user_email" label="邮箱">
         </el-table-column>
-        <!-- <el-table-column prop="updateTime" label="最后修改时间" sortable width="130">
-            <template slot-scope="scope">
-            <i class="el-icon-time"></i>
-            <span>{{ scope.row.updateTime }}</span>
-          </template>
-        </el-table-column> -->
-        <!-- <el-table-column prop="note" label="标注规范" width="100">
-          <template slot-scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p style="width:250px">{{ scope.row.note }}</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag size="medium">规范详情</el-tag>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column> -->
         <el-table-column label="操作" width="310">
           <template slot-scope="scope">
-            <!-- <el-button size="mini" @click="handleUpload(scope.$index, scope.row)">浏览</el-button> -->
-            <el-button size="mini" @click="handleUpload(scope.$index, scope.row)">与他协作</el-button>
-            <el-button size="mini" type="danger" @click="handleExport(scope.$index, scope.row)">删除</el-button>
+            <el-button size="mini" @click="handleParter(scope.$index, scope.row)">与他协作</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination :page-size = "page_size" @current-change="handleCurrentChange" layout="prev, pager, next" :total="total">
+      <div class="pagination" v-if="total > page_size">
+        <el-pagination :page-size="page_size" @current-change="handleCurrentChange" layout="prev, pager, next" :total="total">
         </el-pagination>
       </div>
     </div>
@@ -83,37 +77,40 @@
 <script>
 import Toast from "../common/Toast";
 import friends from "../../assets/friend.json";
+import { mapState, mapGetters } from "vuex";
 export default {
   components: {
     Toast
   },
   data() {
     return {
-      // url: '../../assets/vuetable.json',
       tableData: [],
+      select_word: "",
+      loading: true,
       cur_page: 1,
       page_size: 6,
-      select_word: "",
       dialogFormVisible: false,
-      smallFormLabelWidth: "50px",
-      formLabelWidth: "120px",
-      friend: "3400840017@qq.com",
+      dialogPartnerVisible: false,
+      friendName: "3400840017@qq.com",
       type: "email",
       sending: false,
       searching: false,
-      searchData: null
+      searchData: null,
+      checked: []
     };
   },
   created() {
-    this.getData();
+    this.getFileData();
+    this.getFriendData();
   },
   computed: {
+    ...mapState(["friend"]),
     total() {
-      return friends.list.length;
+      return this.friend.length;
     },
     data() {
-      const self = this;
-      return self.tableData.filter(function(d) {
+      var self = this;
+      return self.friend.filter(function(d) {
         var str = JSON.stringify(d);
         if (str.indexOf(self.select_word) > -1) {
           return d;
@@ -122,13 +119,33 @@ export default {
     }
   },
   methods: {
+    cancel() {
+      this.checked = [];
+      this.dialogPartnerVisible = false;
+    },
+    submit() {
+      this.cancel();
+    },
+    getFileData() {
+      let self = this;
+      this.$store.dispatch("fileList", {
+        listType: "file_owner",
+        self: self
+      });
+    },
+    getFriendData() {
+      let self = this;
+      this.$store.dispatch("friendList", {
+        self: self
+      });
+    },
     searchFriend() {
       var self = this;
       this.searching = true;
       this.$store.dispatch("searchFriend", {
         self: self,
         type: self.type,
-        friend: self.friend
+        friend: self.friendName
       });
     },
     addFriend() {
@@ -137,55 +154,37 @@ export default {
       this.$store.dispatch("addFriend", {
         self: self,
         type: self.type,
-        friend: self.friend
+        friend: self.friendName
       });
-    },
-    delTag(tag) {
-      this.tags.splice(this.tags.indexOf(tag), 1);
-    },
-    handleChange(value) {
-      console.log(value);
-    },
-    release() {
-      this.dialogFormVisible = false;
     },
     handleCurrentChange(val) {
       this.cur_page = val;
-      this.getData();
+      this.getFriendData();
     },
-    getData() {
-      let self = this;
-      var start = (self.cur_page - 1) * self.page_size;
-      var end = self.cur_page * self.page_size;
-      var data = friends.list.slice(start, end);
-      self.tableData = data;
-      // if (process.env.NODE_ENV === "development") {
-      //   self.url = "/ms/table/list";
-      // }
-      // self.$axios.post(self.url, { page: self.cur_page }).then(res => {
-      //   self.tableData = res.data.list;
-      // });
+    handleParter(index, row) {
+      this.dialogPartnerVisible = true;
+      // this.$message("与他协作-第" + (index + 1) + "行");
     },
-    formatter(row, column) {
-      return row.address;
-    },
-    filterTag(value, row) {
-      return row.tag === value;
-    },
-    handleUpload(index, row) {
-      this.$message("上传-第" + (index + 1) + "行");
-    },
-    handleSpider(index, row) {
-      this.$message.error("抓取-第" + (index + 1) + "行");
-    },
-    handlePreprocess(index, row) {
-      this.$message("预处理-第" + (index + 1) + "行");
-    },
-    handleTag(index, row) {
-      this.$message("标注-第" + (index + 1) + "行");
-    },
-    handleExport(index, row) {
-      this.$message.error("导出-第" + (index + 1) + "行");
+    handleDelete(index, row) {
+      const self = this;
+      this.$confirm("确定删除该好友么?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$store.dispatch("delFriend", {
+            self: self,
+            index: index,
+            _id: row._id
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -205,9 +204,11 @@ export default {
   width: 300px;
   display: inline-block;
 }
+
 .name-wrapper {
   cursor: pointer;
 }
+
 table {
   .el-button {
     margin-left: 2px;
@@ -217,13 +218,24 @@ table {
     margin-left: 0px;
   }
 }
-.title{
+
+.title {
   margin: 10px 0;
 }
-.card-info{
+
+.card-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.el-checkbox.is-bordered + .el-checkbox.is-bordered {
+  margin-left: 0;
+}
+
+.el-checkbox {
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
 </style>

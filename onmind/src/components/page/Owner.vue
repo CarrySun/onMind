@@ -13,30 +13,23 @@
         </div>
         <div>
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">新建文件</el-button>
-          <el-dialog title="新建文件" :visible.sync="dialogFormVisible" width = "40%">
-            <el-form  :rules="rules" ref="newFile" :model="newFile">
+          <el-dialog title="新建文件" :visible.sync="dialogFormVisible" width="40%">
+            <el-form :rules="rules" ref="newFile" :model="newFile">
               <el-form-item label="文件名" prop="file_title" :label-width="formLabelWidth" placeholder="请输入文件名">
                 <el-input autofocus="autofocus" v-model="newFile.file_title" auto-complete="off" style="width:80%"></el-input>
               </el-form-item>
-              <el-form-item label="文件类型" prop="file_type" :label-width="formLabelWidth">
+              <!-- <el-form-item label="文件类型" prop="file_type" :label-width="formLabelWidth">
                 <el-select v-model="newFile.file_type" placeholder="请选择文件类型" style="width: 80%;">
                     <el-option label="文档" value="normal"></el-option>
                     <el-option label="思维导图" value="mind"></el-option>
                   </el-select>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="协作者" :label-width="formLabelWidth">
-                <el-select
-                v-model="newFile.file_partner"
-                multiple
-                filterable
-                default-first-option
-                placeholder="请选择协作者"
-                style="width: 80%;">
-                    <el-option label="peerslee" value="peerslee"></el-option>
-                    <el-option label="jialee" value="jialee"></el-option>
-                    <el-option label="leesun" value="leesun"></el-option>
-                  </el-select>
-                  <div style="color:#ccc"><i class="el-icon-info"></i> 协作者必须为好友</div>
+                <el-select v-model="newFile.file_partner" multiple filterable default-first-option placeholder="请选择协作者" style="width: 80%;">
+                  <el-option v-for="(item, index) in friend" :key="index" :label="item.user_name" :value="item.user_name"></el-option>
+                </el-select>
+                <div style="color:#ccc">
+                  <i class="el-icon-info"></i> 协作者必须为好友</div>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -46,18 +39,36 @@
           </el-dialog>
         </div>
       </div>
-
+      <el-dialog title="协作成员" :visible.sync="dialogPartnerVisible" width="40%">
+        <el-form :rules="rules" ref="newPartner" :model="newPartner">
+          <el-form-item label="协作者" :label-width="formLabelWidth">
+            <el-select v-model="newPartner.file_partner" multiple filterable default-first-option placeholder="请选择协作者" style="width: 80%;">
+              <el-option v-for="(item, index) in friend" :key="index" :label="item.user_name" :value="item.user_name"></el-option>
+            </el-select>
+            <div style="color:#ccc">
+              <i class="el-icon-info"></i> 协作者必须为好友</div>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="cancelPartner">取 消</el-button>
+          <el-button type="primary" @click="submitPartner">确 定</el-button>
+        </div>
+      </el-dialog>
       <el-table v-loading="loading" :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column prop="file_title" label="文件名">
         </el-table-column>
-        <el-table-column prop="file_type" label="文件类型">
-        </el-table-column>
+        <!-- <el-table-column prop="file_type" label="文件类型">
+        </el-table-column> -->
         <el-table-column prop="file_owner.user_name" label="拥有者">
         </el-table-column>
+        <el-table-column label="协作者">
+          <template slot-scope="scope">
+            <el-tag style="margin-right:3px" v-for="(item, index) in scope.row.file_partner" :key="index">{{ item.user_name }} </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="updateTime" label="最后修改时间" sortable>
-            <template slot-scope="scope">
+          <template slot-scope="scope">
             <i class="el-icon-time"></i>
-            <!-- <span>{{ scope.row.updateTime | moment("from", "now") }}</span> -->
             <span>{{ scope.row.updateTime | moment("YYYY-MM-DD HH:mm:ss") }}</span>
           </template>
         </el-table-column>
@@ -66,7 +77,7 @@
             <el-button size="mini" @click="handleInfo(scope.$index, scope.row)">浏览</el-button>
             <el-button size="mini" @click="handleRename(scope.$index, scope.row)">重命名</el-button>
             <el-button size="mini" @click="handlePartner(scope.$index, scope.row)">协作</el-button>
-            <el-button size="mini" @click="handleExport(scope.$index, scope.row)">导出</el-button>
+            <el-button size="mini" disabled @click="handleExport(scope.$index, scope.row)">导出</el-button>
             <el-button size="mini" type="danger" @click="handleDel(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -76,12 +87,14 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+
 export default {
   data() {
     var validateTitle = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("请输入文件名"));
-      } else if(value.length > 15) {
+      } else if (value.length > 15) {
         return callback(new Error("文件名长度在 15 个字符之内"));
       } else {
         this.$store
@@ -102,21 +115,21 @@ export default {
     };
     return {
       loading: true,
-      adding: false,
+      // adding: false,
       tableData: [],
       multipleSelection: [],
       select_word: "",
       dialogFormVisible: false,
+      dialogPartnerVisible: false,
       newFile: {
         file_title: "",
-        file_partner: "",
+        file_partner: [],
         file_type: "mind"
       },
-      form: {
-        file_title: "",
-        file_owner: "",
-        file_type: "",
-        updateTime: ""
+      newPartner: {
+        index: "",
+        _id: "",
+        file_partner: []
       },
       smallFormLabelWidth: "50px",
       formLabelWidth: "120px",
@@ -134,8 +147,10 @@ export default {
   },
   created() {
     this.getData();
+    this.getFriendData();
   },
   computed: {
+    ...mapState(["friend"]),
     data() {
       const self = this;
       return self.tableData.filter(function(d) {
@@ -147,13 +162,35 @@ export default {
     }
   },
   methods: {
+    getFriendData() {
+      let self = this;
+      this.$store.dispatch("friendList", {
+        self: self
+      });
+    },
     cancel() {
       this.newFile = {
         file_title: "",
-        file_partner: "",
-        file_type: ""
+        file_partner: [],
+        file_type: "mind"
       };
       this.dialogFormVisible = false;
+    },
+    cancelPartner() {
+      this.newPartner = {
+        file_partner: [],
+        index: 0,
+        _id: ""
+      };
+    },
+    submitPartner() {
+      var self = this;
+      this.$store.dispatch("updateFilePartner", {
+        self: self,
+        index: self.newPartner.index,
+        _id: self.newPartner._id,
+        file_partner: self.newPartner.file_partner
+      });
     },
     submit(formName) {
       const self = this;
@@ -176,7 +213,7 @@ export default {
       this.$store.dispatch("fileList", {
         listType: "file_owner",
         self: self
-      })
+      });
     },
     handleInfo(index, row) {
       let { href } = this.$router.resolve({
@@ -210,7 +247,16 @@ export default {
         .catch(() => {});
     },
     handlePartner(index, row) {
-      this.$message("第" + (index + 1) + "行");
+      this.dialogPartnerVisible = true;
+      var arr = [];
+      for(var i in row.file_partner){
+        arr.push(row.file_partner[i].user_name)
+      }
+      this.newPartner = {
+        index: index,
+        file_partner: arr,
+        _id: row._id
+      };
     },
     handleExport(index, row) {
       this.$message("第" + (index + 1) + "行");
@@ -253,9 +299,11 @@ export default {
   width: 300px;
   display: inline-block;
 }
+
 .name-wrapper {
   cursor: pointer;
 }
+
 table {
   .el-button {
     margin-left: 2px;

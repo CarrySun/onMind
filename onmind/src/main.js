@@ -8,7 +8,7 @@ import "./assets/icon/iconfont.css";
 
 Vue.use(ElementUI);
 router.beforeEach((to, from, next) => {
-  console.log(localStorage.getItem('accessToken'))
+  // console.log(localStorage.getItem('accessToken'))
   if (to.meta.auth) {
     if (to.name == 'login') {
       if (localStorage.getItem('accessToken')) {

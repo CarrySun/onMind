@@ -23,11 +23,16 @@ const FILE_LIST = HOST + "/file/list";
 const DEL_FILE = HOST + "/file/delete";
 const UPDATE_FILE = HOST + "/file/update";
 const GET_FILEDATA = HOST + "/file/getData";
-const ADD_FRIEND = HOST + "/friend/addFriend";
-const SEARCH_FRIEND = HOST + "/friend/searchFriend";
+const QUIT_PARTNER = HOST + "/file/quitPartner"
+
+const ADD_FRIEND = HOST + "/friend/add";
+const SEARCH_FRIEND = HOST + "/friend/search";
+const FRIEND_LIST = HOST + "/friend/list"
+const DEL_FRIEND = HOST + "/friend/delete"
 
 const NOTICE_LIST = HOST + "/notice/list";
 const UPDATE_NOTICE = HOST + "/notice/update";
+
 export function isNameRepeatApi(formData) {
   return axios.post(IS_NAME_REPEAT, formData);
 }
@@ -72,17 +77,27 @@ export function updateFileApi(formData) {
   return axios.post(UPDATE_FILE, formData);
 }
 
-// friends
 export function getFileDataApi(formData) {
   return axios.post(GET_FILEDATA, formData);
 }
 
+// friends
+export function friendListApi(formData) {
+  return axios.post(FRIEND_LIST, formData);
+}
 export function addFriendApi(formData) {
   return axios.post(ADD_FRIEND, formData);
 }
 export function searchFriendApi(formData) {
   return axios.post(SEARCH_FRIEND, formData);
 }
+export function delFriendApi(formData) {
+  return axios.post(DEL_FRIEND, formData);
+}
+export function quitPartnerApi(formData) {
+  return axios.post(QUIT_PARTNER, formData);
+}
+
 //notive
 export function noticeListApi(formData) {
   return axios.post(NOTICE_LIST, formData);

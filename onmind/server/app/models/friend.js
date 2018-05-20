@@ -3,21 +3,14 @@ var mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 
-var UserSchema = new Schema({
-  user_name: {
-    unique: true,
-    type: String
+var FriendSchema = new Schema({
+  answer_id: {
+    type: ObjectId,
+    ref: "User"
   },
-  user_password: String,
-  user_email:{
-    unique: true,
-    type: String
-  },
-  accessToken: String,
-  verifyCode: String,
-  verified: {
-    type: Boolean,
-    default: false
+  ask_id: {
+    type: ObjectId,
+    ref: "User"
   },
   createTime: {
     type: Date,
@@ -28,7 +21,7 @@ var UserSchema = new Schema({
     default: Date.now()
   }
 })
-UserSchema.pre('save', function(next) {
+FriendSchema.pre('save', function(next) {
   if (!this.isNew) {
     this.updateTime = Date.now()
   } else {
@@ -37,4 +30,4 @@ UserSchema.pre('save', function(next) {
   next()
 })
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('Friend', FriendSchema)

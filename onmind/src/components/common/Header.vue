@@ -48,7 +48,10 @@
         <div v-else class="noData">
           <p>暂无通知</p>
         </div>
-        <i slot="reference" class="icon el-icon-bell"></i>
+        <el-badge :value="notice.length" class="item"  slot="reference">
+          <i class="icon el-icon-bell"></i>
+        </el-badge>
+        <!-- <i slot="reference" class="icon el-icon-bell"></i> -->
       </el-popover>
 
       <el-dropdown trigger="click" @command="handleCommand">
@@ -86,7 +89,7 @@ export default {
   mounted() {},
   methods: {
     handleInfo(content) {
-      console.log(123)
+      console.log(123);
       let { href } = this.$router.resolve({
         name: "file",
         query: {
@@ -163,10 +166,10 @@ export default {
   .noticeContent {
     font-size: 16px;
   }
-  .fileTitle{
+  .fileTitle {
     font-size: 20px;
     cursor: pointer;
-    color: #409EFF;
+    color: #409eff;
   }
 }
 
@@ -216,5 +219,8 @@ export default {
   font-weight: bolder;
   cursor: pointer;
   padding-right: 20px;
+}
+.item {
+  position: relative;
 }
 </style>

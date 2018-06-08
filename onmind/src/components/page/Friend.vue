@@ -14,7 +14,7 @@
         </div>
         <div>
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">添加好友</el-button>
-          <el-dialog title="添加好友" :visible.sync="dialogFormVisible">
+          <el-dialog :before-close="cancelAdd" title="添加好友" :visible.sync="dialogFormVisible">
             <div style="margin-top: 15px;">
               <p class="title">请输入邮箱或用户名添加好友</p>
               <el-input placeholder="" v-model="friendName" class="input-with-select">
@@ -40,7 +40,7 @@
               <el-button type="primary" @click="release">确 定</el-button>
             </div> -->
           </el-dialog>
-          <el-dialog title="选择要与他协作的文件" :visible.sync="dialogPartnerVisible" width="40%">
+          <el-dialog :before-close="cancel" title="选择要与他协作的文件" :visible.sync="dialogPartnerVisible" width="40%">
             <div>
               <el-checkbox-group v-model="checked" size="medium">
                 <el-checkbox v-for="(item,index) in tableData" :key="index" :name="item._id" :label="item.file_title" border></el-checkbox>
@@ -96,11 +96,12 @@ export default {
       sending: false,
       searching: false,
       searchData: null,
-      checked: []
+      checked: [],
+      activeFriendId: ""
     };
   },
   created() {
-    this.getFileData();
+    // this.getFileData();
     this.getFriendData();
   },
   computed: {
@@ -119,19 +120,66 @@ export default {
     }
   },
   methods: {
+    cancelAdd() {
+      this.dialogFormVisible = false
+    },
     cancel() {
       this.checked = [];
       this.dialogPartnerVisible = false;
     },
     submit() {
-      this.cancel();
+      var self = this;
+      var checked = self.checked.concat();
+      var uncheck = [];
+      var index = [];
+      for (var i = 0; i < self.tableData.length; i++) {
+        var flag = false;
+        for (var j in self.checked) {
+          if (self.tableData[i].file_title == self.checked[j]) {
+            flag = true;
+            break;
+          }
+        }
+        if (!flag) {
+          uncheck.push(self.tableData[i].file_title);
+        }
+      }
+      this.$store.dispatch("addPartner", {
+        self: self,
+        checked: checked,
+        uncheck: uncheck,
+        file_partner: self.activeFriendId
+      });
     },
     getFileData() {
       let self = this;
-      this.$store.dispatch("fileList", {
-        listType: "file_owner",
-        self: self
-      });
+      this.$store
+        .dispatch("fileList", {
+          listType: "file_owner",
+          self: self
+        })
+        .then(function(res) {
+          self.loading = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.tableData = data.data;
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "文件列表获取失败，请重试",
+            type: "error"
+          });
+        });
     },
     getFriendData() {
       let self = this;
@@ -162,8 +210,45 @@ export default {
       this.getFriendData();
     },
     handleParter(index, row) {
-      this.dialogPartnerVisible = true;
-      // this.$message("与他协作-第" + (index + 1) + "行");
+      var self = this;
+      this.$store
+        .dispatch("fileList", {
+          listType: "file_owner",
+          self: self
+        })
+        .then(function(res) {
+          self.loading = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.tableData = data.data;
+              self.activeFriendId = row.user_id;
+              var data = self.tableData.concat();
+              for (var i in data) {
+                for (var j = 0; j < data[i].file_partner.length; j++) {
+                  if (data[i].file_partner[j]._id == self.activeFriendId) {
+                    self.checked.push(data[i].file_title);
+                    break;
+                  }
+                }
+              }
+              self.dialogPartnerVisible = true;
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "文件列表获取失败，请重试",
+            type: "error"
+          });
+        });
     },
     handleDelete(index, row) {
       const self = this;

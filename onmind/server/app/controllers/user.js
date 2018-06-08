@@ -257,37 +257,39 @@ exports.forget = async (ctx, next) => {
 exports.update = async (ctx, next) => {
   var body = ctx.request.body;
   var user = ctx.session.user;
-  var fields = "user_sex,avatar,nickname,user_birth,user_height,user_weight".split(
-    ","
-  );
-  user.vibrate = body.vibrate;
+  var fields = "user_name".split(",");
   fields.forEach(function(field) {
     if (body[field]) {
       user[field] = xss(body[field].trim());
     }
   });
-  if (user.user_birth) {
-    user.user_age =
-      new Date().getYear() - new Date(user.user_birth).getYear() + 1;
+  try {
+    user = await user.save();
+  } catch (e) {
+    console.log(e);
+    ctx.body = {
+      success: false,
+      err: e
+    };
+    return next;
   }
-  user = await user.save();
   ctx.body = {
     success: true,
-    user: user
+    data: user
   };
 };
 exports.updatePwd = async (ctx, next) => {
-  var oldPwd = ctx.request.body.oldPwd;
-  var newPwd = ctx.request.body.newPwd;
+  var oldpwd = ctx.request.body.oldpwd;
+  var newpwd = ctx.request.body.newpwd;
   var user = ctx.session.user;
-
-  if (user.user_password == oldPwd) {
-    user.user_password = newPwd;
+  console.log(user.user_password)
+  if (user.user_password == oldpwd) {
+    user.user_password = newpwd;
     try {
       user = await user.save();
       ctx.body = {
         success: true,
-        data: "保存成功"
+        data: user
       };
     } catch (e) {
       console.log(e);

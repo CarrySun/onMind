@@ -4,18 +4,16 @@ axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
 window.axios = axios;
 
-let HOST = null;
-
-if (process.env.NODE_ENV === "development") {
-  HOST = "/api";
-} else {
-}
+let HOST = "/api";
 const IS_NAME_REPEAT = HOST + "/user/isNameRepeat";
 const REG = HOST + "/user/reg";
 const VERIFY = HOST + "/user/verify";
 const LOG = HOST + "/user/log";
 const FORGET = HOST + "/user/forget";
 const VERIFYFORGET = HOST + "/user/verifyForget";
+const UPDATE_USER = HOST + "/user/update"
+const UPDATE_PWD = HOST + "/user/updatePwd"
+
 
 const IS_Title_REPEAT = HOST + "/file/isTitleRepeat";
 const ADD_FILE = HOST + "/file/add";
@@ -29,6 +27,7 @@ const ADD_FRIEND = HOST + "/friend/add";
 const SEARCH_FRIEND = HOST + "/friend/search";
 const FRIEND_LIST = HOST + "/friend/list"
 const DEL_FRIEND = HOST + "/friend/delete"
+const ADD_PARTNER = HOST + "/friend/addPartner"
 
 const NOTICE_LIST = HOST + "/notice/list";
 const UPDATE_NOTICE = HOST + "/notice/update";
@@ -56,6 +55,12 @@ export function forgetApi(formData) {
 export function verifyForgetApi(formData) {
   return axios.post(VERIFYFORGET, formData);
 }
+export function updateUserApi(formData) {
+  return axios.post(UPDATE_USER, formData);
+}
+export function updatePwdApi(formData) {
+  return axios.post(UPDATE_PWD, formData);
+}
 
 export function isTitleRepeatApi(formData) {
   return axios.post(IS_Title_REPEAT, formData);
@@ -82,6 +87,7 @@ export function getFileDataApi(formData) {
 }
 
 // friends
+
 export function friendListApi(formData) {
   return axios.post(FRIEND_LIST, formData);
 }
@@ -96,6 +102,9 @@ export function delFriendApi(formData) {
 }
 export function quitPartnerApi(formData) {
   return axios.post(QUIT_PARTNER, formData);
+}
+export function addPartnerApi(formData) {
+  return axios.post(ADD_PARTNER, formData);
 }
 
 //notive

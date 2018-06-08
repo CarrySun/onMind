@@ -13,13 +13,14 @@
             <i class="el-icon-arrow-left">onMind</i>
           </a>
           &nbsp;&nbsp;|&nbsp;&nbsp;
-          <span @click="click" v-if="edited">{{file_title}}</span>
-          <el-form :inline-message="true" status-icon :model="reForm" ref="reForm" :rules="rules" v-else>
+          <span>{{file_title}}</span>
+          <!-- <span @click="click" v-if="edited">{{file_title}}</span> -->
+          <!-- <el-form :inline-message="true" status-icon :model="reForm" ref="reForm" :rules="rules" v-else>
             <el-form-item prop="file_title" placeholder="请输入文件名">
               <el-input style="width:auto" v-model="reForm.file_title" placeholder="请输入内容" @keyup.enter.native="reTitle('reForm')"></el-input>
             </el-form-item>
             <input type="text" name="test" style="display:none" />
-          </el-form>
+          </el-form> -->
         </div>
         <div class="save">
           {{save}}

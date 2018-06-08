@@ -59,14 +59,14 @@ export default {
     if (data.ask_id._id == user._id) {
       friend = {
         _id: data._id,
-        user_id: data.answer_id.user_id,
+        user_id: data.answer_id._id,
         user_name: data.answer_id.user_name,
         user_email: data.answer_id.user_email
       }
     } else if (data.answer_id._id == user._id) {
       friend = {
         _id: data._id,
-        user_id: data.ask_id.user_id,
+        user_id: data.ask_id._id,
         user_name: data.ask_id.user_name,
         user_email: data.ask_id.user_email
       }

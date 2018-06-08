@@ -4,7 +4,7 @@
       <div class="crumbs">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item>
-            <i class="el-icon-file"></i> 我的文件</el-breadcrumb-item>
+            <i class="el-icon-file"></i> 与我协作</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="handle-box">
@@ -54,7 +54,7 @@ export default {
       tableData: [],
       multipleSelection: [],
       select_word: "",
-      dialogFormVisible: false,
+      dialogFormVisible: false
     };
   },
   created() {
@@ -75,10 +75,33 @@ export default {
   methods: {
     getData() {
       let self = this;
-      this.$store.dispatch("fileList", {
-        listType: "file_partner",
-        self: self
-      });
+      this.$store
+        .dispatch("fileList", {
+          listType: "file_partner",
+          self: self
+        })
+        .then(function(res) {
+          self.loading = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.tableData = data.data;
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "文件列表获取失败，请重试",
+            type: "error"
+          });
+        });
     },
     handleInfo(index, row) {
       let { href } = this.$router.resolve({
@@ -109,7 +132,7 @@ export default {
             message: "已取消删除"
           });
         });
-    },
+    }
   }
 };
 </script>

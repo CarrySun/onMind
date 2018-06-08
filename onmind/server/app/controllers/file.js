@@ -39,7 +39,7 @@ exports.add = async (ctx, next) => {
   if (body.file_partner.length > 0) {
     for (var i in body.file_partner) {
       var partner = await User.findOne({ user_name: body.file_partner[i] });
-      file_partner.push(partner._id.toString())
+      file_partner.push(partner._id.toString());
     }
   }
   var file = new File({
@@ -47,7 +47,7 @@ exports.add = async (ctx, next) => {
     file_type: body.file_type,
     file_partner: file_partner,
     file_owner: user._id
-  })
+  });
   try {
     file = await file.save();
     if (file_partner.length > 0) {
@@ -81,12 +81,14 @@ exports.add = async (ctx, next) => {
   var id = file._id;
   file = await File.findOne({ _id: id })
     .populate("file_owner", userFields.join(" "))
+    .populate("file_partner", userFields.join(" "))
     .exec();
   ctx.body = {
     success: true,
     file: file
   };
 };
+
 exports.list = async (ctx, next) => {
   var body = ctx.request.body;
   var listType = ctx.request.body.listType;
@@ -140,16 +142,16 @@ exports.quitPartner = async (ctx, next) => {
   var user = ctx.session.user;
   var file = await File.findOne({ _id: body._id });
   if (file) {
-    var file_partner = file.file_partner
-    var index = -1
+    var file_partner = file.file_partner;
+    var index = -1;
     for (var i = 0; i < file_partner.length; i++) {
       if (file_partner[i].toString == user._id.toString) {
-        index = i
+        index = i;
       }
     }
     if (index != -1) {
-      file_partner.splice(index, 1)
-      file.file_partner = file_partner
+      file_partner.splice(index, 1);
+      file.file_partner = file_partner;
       try {
         file = await file.save();
       } catch (e) {
@@ -167,13 +169,13 @@ exports.quitPartner = async (ctx, next) => {
     } else {
       ctx.body = {
         success: false,
-        err: '你不是协作者哦'
+        err: "你不是协作者哦"
       };
     }
   } else {
     ctx.body = {
       success: false,
-      err: '此文件不存在'
+      err: "此文件不存在"
     };
   }
 };
@@ -188,11 +190,11 @@ exports.update = async (ctx, next) => {
     } else if (body.file_details) {
       file.file_details = body.file_details;
     } else if (body.file_partner) {
-      var file_partner = []
+      var file_partner = [];
       if (body.file_partner.length > 0) {
         for (var i in body.file_partner) {
           var partner = await User.findOne({ user_name: body.file_partner[i] });
-          file_partner.push(partner._id.toString())
+          file_partner.push(partner._id.toString());
         }
       }
       file.file_partner = file_partner;
@@ -200,8 +202,29 @@ exports.update = async (ctx, next) => {
     try {
       file = await file.save();
       file = await File.findOne({ _id: file._id })
+        .populate("file_owner", userFields.join(" "))
         .populate("file_partner", userFields.join(" "))
-        .exec()
+        .exec();
+      if (file_partner.length > 0) {
+        for (var i in file_partner) {
+          var notice = new Notice({
+            toUser: file_partner[i],
+            fromUser: user._id,
+            type: "addPartner",
+            content: file._id
+          });
+          try {
+            notice = await notice.save();
+          } catch (e) {
+            console.log(e);
+            ctx.body = {
+              success: false,
+              err: e
+            };
+            return next;
+          }
+        }
+      }
     } catch (e) {
       console.log(e);
       ctx.body = {

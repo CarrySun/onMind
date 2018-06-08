@@ -13,7 +13,7 @@
         </div>
         <div>
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">新建文件</el-button>
-          <el-dialog title="新建文件" :visible.sync="dialogFormVisible" width="40%">
+          <el-dialog :before-close="cancel" title="新建文件" :visible.sync="dialogFormVisible" width="40%">
             <el-form :rules="rules" ref="newFile" :model="newFile">
               <el-form-item label="文件名" prop="file_title" :label-width="formLabelWidth" placeholder="请输入文件名">
                 <el-input autofocus="autofocus" v-model="newFile.file_title" auto-complete="off" style="width:80%"></el-input>
@@ -33,13 +33,13 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="cancel()">取 消</el-button>
+              <el-button @click="cancel">取 消</el-button>
               <el-button type="primary" @click="submit('newFile')">确 定</el-button>
             </div>
           </el-dialog>
         </div>
       </div>
-      <el-dialog title="协作成员" :visible.sync="dialogPartnerVisible" width="40%">
+      <el-dialog :before-close="cancelPartner" title="协作成员" :visible.sync="dialogPartnerVisible" width="40%">
         <el-form :rules="rules" ref="newPartner" :model="newPartner">
           <el-form-item label="协作者" :label-width="formLabelWidth">
             <el-select v-model="newPartner.file_partner" multiple filterable default-first-option placeholder="请选择协作者" style="width: 80%;">
@@ -77,7 +77,7 @@
             <el-button size="mini" @click="handleInfo(scope.$index, scope.row)">浏览</el-button>
             <el-button size="mini" @click="handleRename(scope.$index, scope.row)">重命名</el-button>
             <el-button size="mini" @click="handlePartner(scope.$index, scope.row)">协作</el-button>
-            <el-button size="mini" disabled @click="handleExport(scope.$index, scope.row)">导出</el-button>
+            <!-- <el-button size="mini" disabled @click="handleExport(scope.$index, scope.row)">导出</el-button> -->
             <el-button size="mini" type="danger" @click="handleDel(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -182,6 +182,7 @@ export default {
         index: 0,
         _id: ""
       };
+      this.dialogPartnerVisible = false
     },
     submitPartner() {
       var self = this;
@@ -213,7 +214,28 @@ export default {
       this.$store.dispatch("fileList", {
         listType: "file_owner",
         self: self
-      });
+      }).then(function(res) {
+          self.loading = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.tableData = data.data;
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "文件列表获取失败，请重试",
+            type: "error"
+          });
+        });
     },
     handleInfo(index, row) {
       let { href } = this.$router.resolve({

@@ -8,6 +8,13 @@ var FileSchema = new Schema({
   file_title: String,
   file_type: String,
   file_details: [String],
+  isEdit: false,
+  editingUser: [
+    {
+      type: ObjectId,
+      ref: "User"
+    }
+  ],
   file_owner: {
     type: ObjectId,
     ref: "User"

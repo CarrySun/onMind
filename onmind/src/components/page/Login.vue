@@ -117,9 +117,9 @@ export default {
       btnText: "获取验证码",
       activeName: "log",
       form: {
-        user_name: "carry",
-        user_password: "Aa123321",
-        user_email: "3400840017@qq.com",
+        user_name: "",
+        user_password: "",
+        user_email: "",
         verifyCode: ""
       },
       forgetForm: {

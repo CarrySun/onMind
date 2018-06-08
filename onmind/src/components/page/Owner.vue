@@ -54,6 +54,22 @@
           <el-button type="primary" @click="submitPartner">确 定</el-button>
         </div>
       </el-dialog>
+      <el-dialog :before-close="cancelShare" title="分享文件" :visible.sync="dialogShareVisible" width="40%">
+        <el-form :rules="rules" ref="newPartner" :model="newPartner">
+          <el-form-item label="协作者" :label-width="formLabelWidth">
+            <el-select v-model="newPartner.file_partner" multiple filterable default-first-option placeholder="请选择协作者" style="width: 80%;">
+              <el-option v-for="(item, index) in friend" :key="index" :label="item.user_name" :value="item.user_name"></el-option>
+            </el-select>
+            <div style="color:#ccc">
+              <i class="el-icon-info"></i> 协作者必须为好友</div>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="cancelPartner">取 消</el-button>
+          <el-button type="primary" @click="submitPartner">确 定</el-button>
+        </div>
+      </el-dialog>
+
       <el-table v-loading="loading" :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column prop="file_title" label="文件名">
         </el-table-column>
@@ -77,6 +93,7 @@
             <el-button size="mini" @click="handleInfo(scope.$index, scope.row)">浏览</el-button>
             <el-button size="mini" @click="handleRename(scope.$index, scope.row)">重命名</el-button>
             <el-button size="mini" @click="handlePartner(scope.$index, scope.row)">协作</el-button>
+            <!-- <el-button size="mini" @click="handleShare(scope.$index, scope.row)">分享</el-button> -->
             <!-- <el-button size="mini" disabled @click="handleExport(scope.$index, scope.row)">导出</el-button> -->
             <el-button size="mini" type="danger" @click="handleDel(scope.$index, scope.row)">删除</el-button>
           </template>
@@ -114,6 +131,8 @@ export default {
       }
     };
     return {
+      dialogShareVisible: false,
+      activeRow: {},
       loading: true,
       // adding: false,
       tableData: [],
@@ -279,6 +298,11 @@ export default {
         file_partner: arr,
         _id: row._id
       };
+    },
+    handleShare(index, row) {
+      this.dialogShareVisible = true
+      this.activeRow = row
+      // this.$message("第" + (index + 1) + "行");
     },
     handleExport(index, row) {
       this.$message("第" + (index + 1) + "行");

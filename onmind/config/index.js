@@ -20,8 +20,8 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
     proxyTable: {
-      '/api': {
-        target: 'http://localhost:3000',
+      '/api/': {
+        target: 'http://localhost:3000/',
         changeOrigin: true
       }
     },

@@ -17,7 +17,7 @@
           <el-dialog :before-close="cancelAdd" title="添加好友" :visible.sync="dialogFormVisible">
             <div style="margin-top: 15px;">
               <p class="title">请输入邮箱或用户名添加好友</p>
-              <el-input placeholder="" v-model="friendName" class="input-with-select">
+              <el-input placeholder="" v-model="friendName" class="input-with-select"  @keyup.enter.native="searchFriend" >
                 <el-select style="width: 130px;" v-model="type" slot="prepend" placeholder="请选择">
                   <el-option label="邮箱" value="email"></el-option>
                   <el-option label="用户名" value="name"></el-option>
@@ -28,7 +28,7 @@
               <el-card class="box-card" v-if='searchData'>
                 <div class="card-info">
                   <div>
-                    <span>{{searchData.user_name}}</span>
+                    <span>{{searchData.user_name}}</span>&nbsp;&nbsp;&nbsp;
                     <span>{{searchData.user_email}}</span>
                   </div>
                   <el-button @click="addFriend" icon="el-icon-plus" style="float: right; padding: 3px 0" type="text">加为好友</el-button>
@@ -91,7 +91,7 @@ export default {
       page_size: 6,
       dialogFormVisible: false,
       dialogPartnerVisible: false,
-      friendName: "3400840017@qq.com",
+      friendName: "",
       type: "email",
       sending: false,
       searching: false,
@@ -121,7 +121,7 @@ export default {
   },
   methods: {
     cancelAdd() {
-      this.dialogFormVisible = false
+      this.dialogFormVisible = false;
     },
     cancel() {
       this.checked = [];
@@ -189,12 +189,14 @@ export default {
     },
     searchFriend() {
       var self = this;
-      this.searching = true;
-      this.$store.dispatch("searchFriend", {
-        self: self,
-        type: self.type,
-        friend: self.friendName
-      });
+      if (self.friendName) {
+        this.searching = true;
+        this.$store.dispatch("searchFriend", {
+          self: self,
+          type: self.type,
+          friend: self.friendName
+        });
+      }
     },
     addFriend() {
       var self = this;

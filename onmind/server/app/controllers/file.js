@@ -198,14 +198,7 @@ exports.update = async (ctx, next) => {
         }
       }
       file.file_partner = file_partner;
-    }
-    try {
-      file = await file.save();
-      file = await File.findOne({ _id: file._id })
-        .populate("file_owner", userFields.join(" "))
-        .populate("file_partner", userFields.join(" "))
-        .exec();
-      if (file_partner.length > 0) {
+      if (file_partner && file_partner.length > 0) {
         for (var i in file_partner) {
           var notice = new Notice({
             toUser: file_partner[i],
@@ -225,6 +218,13 @@ exports.update = async (ctx, next) => {
           }
         }
       }
+    }
+    try {
+      file = await file.save();
+      file = await File.findOne({ _id: file._id })
+        .populate("file_owner", userFields.join(" "))
+        .populate("file_partner", userFields.join(" "))
+        .exec();
     } catch (e) {
       console.log(e);
       ctx.body = {

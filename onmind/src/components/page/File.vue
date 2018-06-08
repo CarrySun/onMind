@@ -340,7 +340,7 @@ export default {
         };
       }
     },
-    async addChild() {
+    addChild() {
       var selected_node = jm.get_selected_node(); // as parent of new node
       if (!selected_node) {
         this.$message("请先选择一个节点");

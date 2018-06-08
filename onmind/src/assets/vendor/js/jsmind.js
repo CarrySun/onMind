@@ -68,7 +68,7 @@
             handles:{
             },
             mapping:{
-                addchild   : 45, // Insert
+                addchild   : 9, // Tab
                 addbrother : 13, // Enter
                 editnode   : 113,// F2
                 delnode    : 46, // Delete

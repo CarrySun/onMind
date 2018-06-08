@@ -45,7 +45,7 @@
         </div>
       </el-header>
       <el-main id="editor">
-        <div id="jsmind_container" @contextmenu="showMenu">
+        <div id="jsmind_container" @contextmenu="showMenu($event)">
           <VueContextMenu :contextMenuData="menuData" @addChild="addChild" @addBrother="addBrother" @editNode="editNode" @delNode="delNode"
             @toggleNode="toggleNode">
           </VueContextMenu>
@@ -66,7 +66,9 @@ import "@/assets/vendor/style/jsmind.scss";
 import common from "@/assets/js/common.js";
 import { mapState, mapGetters } from "vuex";
 var jm = null;
-
+document.onkeydown = function(event){
+  console.log(event.keyCode)
+}
 export default {
   components: {
     VueContextMenu: VueContextMenu
@@ -330,7 +332,7 @@ export default {
       }
     },
     showMenu: function(event) {
-      event.preventDefault();
+      console.log('contextmenu')
       if (event.target.nodeName == "JMNODE") {
         var x = event.clientX;
         var y = event.clientY;
@@ -338,6 +340,8 @@ export default {
           x,
           y
         };
+        event.cancelBubble = true;
+        // event.preventDefault();
       }
     },
     addChild() {

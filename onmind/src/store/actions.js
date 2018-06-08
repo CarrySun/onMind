@@ -467,7 +467,7 @@ export default {
               } else {
                 self.fileData.file_title = formdata.file_title;
                 self.edited = true;
-                self.saveInfo = "所有更改已保存";
+                self.saveState = "所有更改已保存";
               }
             }
           }
@@ -497,6 +497,24 @@ export default {
       accessToken: localStorage.getItem("accessToken")
     });
   },
+
+  async addEditingUser({ dispatch, commit }, formdata) {
+    var data = {
+      file_id: formdata.file_id,
+      accessToken: localStorage.getItem("accessToken")
+    };
+
+    return await apis.addEditingUserApi(data)
+  },
+  async removeEditingUser({ dispatch, commit }, formdata) {
+    var data = {
+      file_id: formdata.file_id,
+      accessToken: localStorage.getItem("accessToken")
+    };
+
+    return await apis.removeEditingUserApi(data)
+  },
+
   // friend
   async friendList({ dispatch, commit }, formdata) {
     commit(types.NULL_FRIEND);
@@ -708,5 +726,5 @@ export default {
         commit(types.UPDATE_NOTICE, res);
       }
     });
-  }
+  },
 };

@@ -244,11 +244,86 @@ exports.update = async (ctx, next) => {
     };
   }
 };
-
+exports.addEditingUser = async (ctx, next) => {
+  var body = ctx.request.body;
+  var user = ctx.session.user;
+  var file_id = body.file_id;
+  var file = await File.findOne({
+    _id: file_id
+  });
+  if (file) {
+    file.isEdit = true;
+    if (!file.editingUser) {
+      file.editingUser = [];
+    }
+    console.log(file.editingUser.indexOf(user._id))
+    if (file.editingUser.indexOf(user._id) == -1){
+      file.editingUser.push(user._id);
+    }
+    try {
+      file = await file.save();
+    } catch (e) {
+      console.log(e);
+      ctx.body = {
+        success: false,
+        err: e
+      };
+      return next;
+    }
+    file = await File.findOne({
+      _id: file_id
+    })
+      .populate("editingUser", userFields.join(" "))
+      .exec();
+    ctx.body = { success: true, data: file };
+  } else {
+    ctx.body = { success: false, err: "没有该文件" };
+  }
+};
+exports.removeEditingUser = async (ctx, next) => {
+  var body = ctx.request.body;
+  var user = ctx.session.user;
+  var file_id = body.file_id;
+  var file = await File.findOne({
+    _id: file_id
+  });
+  if (file) {
+    file.isEdit = true;
+    if (!file.editingUser) {
+      file.editingUser = [];
+    }
+    for (var i = 0; i < file.editingUser.length; i++) {
+      if (file.editingUser[i].toString()  == user._id) {
+        file.editingUser.splice(i, 1);
+        break;
+      }
+    }
+    try {
+      file = await file.save();
+    } catch (e) {
+      console.log(e);
+      ctx.body = {
+        success: false,
+        err: e
+      };
+      return next;
+    }
+    file = await File.findOne({
+      _id: file_id
+    })
+      .populate("editingUser", userFields.join(" "))
+      .exec();
+    ctx.body = { success: true, data: file };
+  } else {
+    ctx.body = { success: false, err: "没有该文件" };
+  }
+};
 exports.getData = async (ctx, next) => {
   var body = ctx.request.body;
   var user = ctx.session.user;
-  var file = await File.findOne({ _id: body._id }).exec();
+  var file = await File.findOne({ _id: body._id })
+    .populate("editingUser", userFields.join(" "))
+    .exec();
   if (file) {
     ctx.body = {
       success: true,

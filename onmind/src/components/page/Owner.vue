@@ -54,21 +54,12 @@
           <el-button type="primary" @click="submitPartner">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog :before-close="cancelShare" title="分享文件" :visible.sync="dialogShareVisible" width="40%">
-        <el-form :rules="rules" ref="newPartner" :model="newPartner">
-          <el-form-item label="协作者" :label-width="formLabelWidth">
-            <el-select v-model="newPartner.file_partner" multiple filterable default-first-option placeholder="请选择协作者" style="width: 80%;">
-              <el-option v-for="(item, index) in friend" :key="index" :label="item.user_name" :value="item.user_name"></el-option>
-            </el-select>
-            <div style="color:#ccc">
-              <i class="el-icon-info"></i> 协作者必须为好友</div>
-          </el-form-item>
-        </el-form>
+      <!-- <el-dialog :before-close="cancelShare" title="分享文件" :visible.sync="dialogShareVisible" width="40%">
         <div slot="footer" class="dialog-footer">
           <el-button @click="cancelPartner">取 消</el-button>
           <el-button type="primary" @click="submitPartner">确 定</el-button>
         </div>
-      </el-dialog>
+      </el-dialog> -->
 
       <el-table v-loading="loading" :data="data" style="width: 100%; text-align:center" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column prop="file_title" label="文件名">

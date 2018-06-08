@@ -11,9 +11,8 @@ const VERIFY = HOST + "/user/verify";
 const LOG = HOST + "/user/log";
 const FORGET = HOST + "/user/forget";
 const VERIFYFORGET = HOST + "/user/verifyForget";
-const UPDATE_USER = HOST + "/user/update"
-const UPDATE_PWD = HOST + "/user/updatePwd"
-
+const UPDATE_USER = HOST + "/user/update";
+const UPDATE_PWD = HOST + "/user/updatePwd";
 
 const IS_Title_REPEAT = HOST + "/file/isTitleRepeat";
 const ADD_FILE = HOST + "/file/add";
@@ -21,13 +20,15 @@ const FILE_LIST = HOST + "/file/list";
 const DEL_FILE = HOST + "/file/delete";
 const UPDATE_FILE = HOST + "/file/update";
 const GET_FILEDATA = HOST + "/file/getData";
-const QUIT_PARTNER = HOST + "/file/quitPartner"
+const QUIT_PARTNER = HOST + "/file/quitPartner";
+const ADD_EDITING_USER = HOST + "/file/addEditingUser";
+const REMOVE_EDITING_USER = HOST + "/file/removeEditingUser";
 
 const ADD_FRIEND = HOST + "/friend/add";
 const SEARCH_FRIEND = HOST + "/friend/search";
-const FRIEND_LIST = HOST + "/friend/list"
-const DEL_FRIEND = HOST + "/friend/delete"
-const ADD_PARTNER = HOST + "/friend/addPartner"
+const FRIEND_LIST = HOST + "/friend/list";
+const DEL_FRIEND = HOST + "/friend/delete";
+const ADD_PARTNER = HOST + "/friend/addPartner";
 
 const NOTICE_LIST = HOST + "/notice/list";
 const UPDATE_NOTICE = HOST + "/notice/update";
@@ -84,6 +85,12 @@ export function updateFileApi(formData) {
 
 export function getFileDataApi(formData) {
   return axios.post(GET_FILEDATA, formData);
+}
+export function addEditingUserApi(formData) {
+  return axios.post(ADD_EDITING_USER, formData);
+}
+export function removeEditingUserApi(formData) {
+  return axios.post(REMOVE_EDITING_USER, formData);
 }
 
 // friends

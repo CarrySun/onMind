@@ -61,7 +61,8 @@
         default_event_handle:{
             enable_mousedown_handle:true,
             enable_click_handle:true,
-            enable_dblclick_handle:true
+          // enable_dblclick_handle: true
+            enable_dblclick_handle:false
         },
         shortcut:{
             enable:true,
@@ -2705,6 +2706,7 @@
     };
 
     // shortcut provider
+
     jm.shortcut_provider= function(jm, options){
         this.jm = jm;
         this.opts = options;
@@ -2716,11 +2718,10 @@
     jm.shortcut_provider.prototype = {
         init : function(){
             jm.util.dom.add_event($d,'keydown',this.handler.bind(this));
-
-            this.handles['addchild'] = this.handle_addchild;
-            this.handles['addbrother'] = this.handle_addbrother;
-            this.handles['editnode'] = this.handle_editnode;
-            this.handles['delnode'] = this.handle_delnode;
+            // this.handles['addchild'] = this.handle_addchild;
+            // this.handles['addbrother'] = this.handle_addbrother;
+            // this.handles['editnode'] = this.handle_editnode;
+            // this.handles['delnode'] = this.handle_delnode;
             this.handles['toggle'] = this.handle_toggle;
             this.handles['up'] = this.handle_up;
             this.handles['down'] = this.handle_down;
@@ -2752,41 +2753,41 @@
             }
         },
 
-        handle_addchild: function(_jm,e){
-            var selected_node = _jm.get_selected_node();
-            if(!!selected_node){
-                var nodeid = jm.util.uuid.newid();
-                var node = _jm.add_node(selected_node, nodeid, 'New Node');
-                if(!!node){
-                    _jm.select_node(nodeid);
-                    _jm.begin_edit(nodeid);
-                }
-            }
-        },
-        handle_addbrother:function(_jm,e){
-            var selected_node = _jm.get_selected_node();
-            if(!!selected_node && !selected_node.isroot){
-                var nodeid = jm.util.uuid.newid();
-                var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
-                if(!!node){
-                    _jm.select_node(nodeid);
-                    _jm.begin_edit(nodeid);
-                }
-            }
-        },
-        handle_editnode:function(_jm,e){
-            var selected_node = _jm.get_selected_node();
-            if(!!selected_node){
-                _jm.begin_edit(selected_node);
-            }
-        },
-        handle_delnode:function(_jm,e){
-            var selected_node = _jm.get_selected_node();
-            if(!!selected_node && !selected_node.isroot){
-                _jm.select_node(selected_node.parent);
-                _jm.remove_node(selected_node);
-            }
-        },
+    //     handle_addchild: function(_jm,e){
+    //         var selected_node = _jm.get_selected_node();
+    //         if(!!selected_node){
+    //             var nodeid = jm.util.uuid.newid();
+    //             var node = _jm.add_node(selected_node, nodeid, 'New Node');
+    //             if(!!node){
+    //                 _jm.select_node(nodeid);
+    //                 _jm.begin_edit(nodeid);
+    //             }
+    //         }
+    //     },
+    //     handle_addbrother:function(_jm,e){
+    //         var selected_node = _jm.get_selected_node();
+    //         if(!!selected_node && !selected_node.isroot){
+    //             var nodeid = jm.util.uuid.newid();
+    //             var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+    //             if(!!node){
+    //                 _jm.select_node(nodeid);
+    //                 _jm.begin_edit(nodeid);
+    //             }
+    //         }
+    //     },
+    //     handle_editnode:function(_jm,e){
+    //         var selected_node = _jm.get_selected_node();
+    //         if(!!selected_node){
+    //             _jm.begin_edit(selected_node);
+    //         }
+    //     },
+    //     handle_delnode:function(_jm,e){
+    //         var selected_node = _jm.get_selected_node();
+    //         if(!!selected_node && !selected_node.isroot){
+    //             _jm.select_node(selected_node.parent);
+    //             _jm.remove_node(selected_node);
+    //         }
+    //     },
         handle_toggle:function(_jm,e){
             var evt = e || event;
             var selected_node = _jm.get_selected_node();

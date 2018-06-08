@@ -23,7 +23,13 @@
           </el-form> -->
         </div>
         <div class="save">
-          {{save}}
+          <!-- {{saveState}} -->
+           <el-tag v-if="fileData.editingUser && fileData.editingUser.length > 0">
+          <!-- <p > -->
+            <span v-for="(item,index) in fileData.editingUser" :key="index">{{item.user_name}}</span>
+            正在编辑
+          </el-tag>
+          <!-- </p> -->
         </div>
         <div class="operation">
           <el-button type="text" @click="handleExport">
@@ -66,9 +72,9 @@ import "@/assets/vendor/style/jsmind.scss";
 import common from "@/assets/js/common.js";
 import { mapState, mapGetters } from "vuex";
 var jm = null;
-document.onkeydown = function(event){
-  console.log(event.keyCode)
-}
+// document.onkeydown = function(event) {
+//   console.log(event.keyCode);
+// };
 export default {
   components: {
     VueContextMenu: VueContextMenu
@@ -129,32 +135,32 @@ export default {
           {
             fnHandler: "addChild",
             icoName: "el-icon-plus",
-            btnName: "插入子主题",
-            shortcut: "Insert"
+            btnName: "插入子主题"
+            // shortcut: "Insert"
           },
           {
             fnHandler: "addBrother",
             icoName: "el-icon-plus",
-            btnName: "插入同级主题",
-            shortcut: "Enter"
+            btnName: "插入同级主题"
+            // shortcut: "Enter"
           },
           {
             fnHandler: "editNode",
             icoName: "el-icon-edit",
-            btnName: "编辑",
-            shortcut: "double-kill"
+            btnName: "编辑"
+            // shortcut: "double-kill"
           },
           {
             fnHandler: "delNode",
             icoName: "el-icon-delete",
-            btnName: "删除",
-            shortcut: "Delete"
+            btnName: "删除"
+            // shortcut: "Delete"
           },
           {
             fnHandler: "toggleNode",
             icoName: "el-icon-menu",
-            btnName: "伸展",
-            shortcut: "Space"
+            btnName: "伸展"
+            // shortcut: "Space"
           }
         ]
       },
@@ -162,7 +168,7 @@ export default {
       edited: true,
       user_name: JSON.parse(localStorage.getItem("user")).user_name,
       loading: true,
-      save: "所有更改已保存到云端",
+      saveState: "所有更改已保存到云端",
       fileData: {},
       reForm: {
         file_title: ""
@@ -173,7 +179,8 @@ export default {
           { validator: validateTitleChange, trigger: ["change"] },
           { validator: validateTitleBlur, trigger: ["blur"] }
         ]
-      }
+      },
+      editable: true
     };
   },
   computed: {
@@ -183,6 +190,17 @@ export default {
     }
   },
   methods: {
+    toggle_editable(event) {
+      var btn = event.target;
+      var editable = jm.get_editable();
+      if (editable) {
+        jm.disable_edit();
+        this.editable = true;
+      } else {
+        jm.enable_edit();
+        this.editable = false;
+      }
+    },
     reTitle(formName) {
       var self = this;
       this.$refs[formName].validate(valid => {
@@ -191,7 +209,7 @@ export default {
           if (value && value === self.file_title) {
           } else if (value) {
             console.log(value);
-            self.save = "正在进行文件重命名";
+            self.saveState = "正在进行文件重命名";
             self.$store.dispatch("updateFileTitle", {
               self: self,
               _id: self.id,
@@ -285,6 +303,22 @@ export default {
         theme: "primary"
       };
       jm = jsMind.show(options, mind);
+      var user = JSON.parse(localStorage.getItem("user"));
+      var flag = true;
+      if (
+        this.fileData.editingUser &&
+        this.fileData.editingUser.length > 0 &&
+        this.fileData.editingUser.indexOf(user._id) == -1
+      ) {
+        flag = false;
+      }
+      if (flag) {
+        this.editable = true;
+        jm.enable_edit();
+      } else {
+        this.editable = false;
+        jm.disable_edit();
+      }
       // var mind_data = jm.get_data();
       // console.log(mind_data);
       // jm.set_readonly(true);
@@ -311,18 +345,44 @@ export default {
     handleExport() {
       jm.screenshot.shootDownload();
     },
+    //右键菜单
+    showMenu: function(event) {
+      if (this.editable) {
+        if (event.target.nodeName == "JMNODE") {
+          var x = event.clientX;
+          var y = event.clientY;
+          this.menuData.axios = {
+            x,
+            y
+          };
+          event.cancelBubble = true;
+          event.preventDefault();
+        }
+      } else {
+        this.$message({
+          type: "error",
+          message: "当前无法编辑"
+        });
+        event.preventDefault();
+      }
+    },
+    //保存更改
     saveDetails(jm) {
       var self = this;
-      this.save = "更改正在保存";
-      this.$store
-        .dispatch("updateDetails", {
-          _id: self.id,
-          file_details: JSON.stringify(jm.data.children)
-        })
-        .then(res => {
-          self.save = "所有更改已保存到云端";
-        });
+      if (this.editable) {
+        this.save = "更改正在保存";
+        this.$store
+          .dispatch("updateDetails", {
+            _id: self.id,
+            file_details: JSON.stringify(jm.data.children)
+          })
+          .then(res => {
+            self.saveState = "所有更改已保存到云端";
+            self.removeEditingUser();
+          });
+      }
     },
+    //获取选择的节点id
     get_selected_nodeid() {
       var selected_node = jm.get_selected_node();
       if (!!selected_node) {
@@ -331,19 +391,47 @@ export default {
         return null;
       }
     },
-    showMenu: function(event) {
-      console.log('contextmenu')
-      if (event.target.nodeName == "JMNODE") {
-        var x = event.clientX;
-        var y = event.clientY;
-        this.menuData.axios = {
-          x,
-          y
-        };
-        event.cancelBubble = true;
-        // event.preventDefault();
-      }
+    addEditingUser() {
+      var self = this;
+      this.$store
+        .dispatch("addEditingUser", {
+          file_id: self.id
+        })
+        .then(res => {
+          if (res.data.success) {
+            self.fileData = res.data.data;
+          } else {
+            self.$message({
+              type: "error",
+              message: res.data.err
+            });
+          }
+        })
+        .catch(err => {
+          callback(new Error("网络错误" + err));
+        });
     },
+    removeEditingUser() {
+      var self = this;
+      this.$store
+        .dispatch("removeEditingUser", {
+          file_id: self.id
+        })
+        .then(res => {
+          if (res.data.success) {
+            self.fileData = res.data.data;
+          } else {
+            self.$message({
+              type: "error",
+              message: res.data.err
+            });
+          }
+        })
+        .catch(err => {
+          callback(new Error("网络错误" + err));
+        });
+    },
+    //添加子节点
     addChild() {
       var selected_node = jm.get_selected_node(); // as parent of new node
       if (!selected_node) {
@@ -356,7 +444,9 @@ export default {
       // this.saveDetails(jm.get_data());
       jm.select_node(nodeid);
       jm.begin_edit(nodeid);
+      this.addEditingUser();
     },
+    //添加兄弟节点
     addBrother() {
       var selected_node = jm.get_selected_node();
       if (!!selected_node && !selected_node.isroot) {
@@ -365,15 +455,19 @@ export default {
         // this.saveDetails(jm.get_data());
         jm.select_node(nodeid);
         jm.begin_edit(nodeid);
+        this.addEditingUser();
       }
     },
+    //编辑节点
     editNode() {
       console.log("edit");
       var selected_node = jm.get_selected_node();
       if (!!selected_node) {
         jm.begin_edit(selected_node);
+        this.addEditingUser();
       }
     },
+    //删除节点
     delNode() {
       var selected_id = this.get_selected_nodeid();
       if (!selected_id) {
@@ -382,8 +476,10 @@ export default {
       }
 
       jm.remove_node(selected_id);
+      this.addEditingUser();
       // this.saveDetails(jm.get_data());
     },
+    //伸缩节点
     toggleNode(e) {
       var evt = e || event;
       var selected_node = jm.get_selected_node();
@@ -392,6 +488,9 @@ export default {
         evt.stopPropagation();
         evt.preventDefault();
       }
+    },
+    beforeunloadHandler(e) {
+      this.removeEditingUser()
     }
   },
   created: function() {
@@ -399,6 +498,13 @@ export default {
   },
   mounted() {
     this.addEventListeners();
+    window.addEventListener("beforeunload", e => this.beforeunloadHandler(e));
+  },
+
+  destroyed() {
+    window.removeEventListener("beforeunload", e =>
+      this.beforeunloadHandler(e)
+    );
   }
 };
 </script>
@@ -412,6 +518,11 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .left {
     display: flex;
     .el-input__inner {
@@ -422,7 +533,7 @@ export default {
   }
   .save {
     position: absolute;
-    width: 200px;
+    width: 600px;
     text-align: center;
     height: 45px;
     top: 0;
@@ -442,11 +553,17 @@ export default {
   .operation {
     font-size: 14px;
     color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .el-button--text {
       color: #fff;
     }
   }
-
+  .operation p {
+    margin-right: 10px;
+    font-size: 16px;
+  }
   .operation .el-dropdown-link {
     position: relative;
     display: inline-block;

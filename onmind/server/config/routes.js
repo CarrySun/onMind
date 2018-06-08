@@ -31,8 +31,9 @@ module.exports = function () {
   router.post("/file/delete", App.hasBody, App.hasToken, File.delete);
   router.post("/file/update", App.hasBody, App.hasToken, File.update);
   router.post("/file/getData", App.hasBody, App.hasToken, File.getData);
-  router.post('/file/quitPartner', App.hasBody, App.hasToken, File.quitPartner);
-
+  router.post("/file/quitPartner", App.hasBody, App.hasToken, File.quitPartner);
+  router.post("/file/addEditingUser", App.hasBody, App.hasToken, File.addEditingUser);
+  router.post("/file/removeEditingUser", App.hasBody, App.hasToken, File.removeEditingUser);
   //friend
 
   router.post("/friend/search", App.hasBody, App.hasToken, Friend.search);

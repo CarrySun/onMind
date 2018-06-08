@@ -243,10 +243,6 @@ export default {
       });
     },
     handleInfo(content) {
-<<<<<<< HEAD
-=======
-      console.log(123);
->>>>>>> 7a658027edfa6658c9909ccbafade9d92c4c5d91
       let { href } = this.$router.resolve({
         name: "file",
         query: {
@@ -382,11 +378,4 @@ export default {
   cursor: pointer;
   padding-right: 20px;
 }
-<<<<<<< HEAD
 </style>
-=======
-.item {
-  position: relative;
-}
-</style>
->>>>>>> 7a658027edfa6658c9909ccbafade9d92c4c5d91

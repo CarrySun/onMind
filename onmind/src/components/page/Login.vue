@@ -96,15 +96,11 @@ export default {
             if (data.success) {
               callback();
             } else {
-              callback(
-                new Error("此用户名已存在")
-              );
+              callback(new Error("此用户名已存在"));
             }
           })
           .catch(err => {
-            callback(
-              new Error("网络错误"+err)
-            );
+            callback(new Error("网络错误" + err));
           });
       }
     };
@@ -195,11 +191,36 @@ export default {
       this.loging = true;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$store.dispatch("log", {
-            user_email: this.form.user_email,
-            user_password: this.form.user_password,
-            self: self
-          });
+          this.$store
+            .dispatch("log", {
+              user_email: this.form.user_email,
+              user_password: this.form.user_password,
+            })
+            .then(function(res) {
+              self.loging = false;
+              if (res.data) {
+                var data = res.data;
+                if (!data.success) {
+                  self.$message({
+                    message: data.err,
+                    type: "error"
+                  });
+                } else if (data.success) {
+                  localStorage.setItem("user", JSON.stringify(data.user));
+                  localStorage.setItem("accessToken", data.user.accessToken);
+                  self.$socket.emit("log", data.user._id);
+                  self.$router.push("/owner");
+                }
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              self.$message({
+                message: "登陆失败，请重试",
+                type: "error"
+              });
+              self.loging = false;
+            });
         } else {
           this.loging = false;
           console.log("error submit!!");
@@ -279,13 +300,42 @@ export default {
       this.reging = true;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$store.dispatch("reg", {
-            user_email: this.form.user_email,
-            user_name: this.form.user_name,
-            user_password: this.form.user_password,
-            verifyCode: this.form.verifyCode,
-            self: self
-          });
+          this.$store
+            .dispatch("reg", {
+              user_email: this.form.user_email,
+              user_name: this.form.user_name,
+              user_password: this.form.user_password,
+              verifyCode: this.form.verifyCode
+            })
+            .then(function(res) {
+              self.reging = false;
+              if (res.data) {
+                var data = res.data;
+                if (!data.success) {
+                  self.$message({
+                    message: data.err,
+                    type: "error"
+                  });
+                } else if (data.success) {
+                  self.$message({
+                    message: "恭喜你!注册成功",
+                    type: "success"
+                  });
+                  localStorage.setItem("user", JSON.stringify(data.user));
+                  localStorage.setItem("accessToken", data.user.accessToken);
+                  self.$socket.emit("log", data.user._id);
+                  self.$router.push("/");
+                }
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              self.$message({
+                message: "注册失败，请重试",
+                type: "error"
+              });
+              self.reging = false;
+            });
         } else {
           this.reging = false;
           console.log("error submit!!");

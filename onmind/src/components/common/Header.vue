@@ -32,7 +32,7 @@
           <el-button type="primary" @click="submitPwd('pwdForm')">修 改</el-button>
         </div>
       </el-dialog>
-      <el-popover placement="bottom" width="350" trigger="click">
+      <el-popover @show="getNotice" placement="bottom" width="350" trigger="click">
         <ul v-if="total" class="hasData">
           <li v-for="(item,index) in notice" :key="index">
             <template v-if="item.type == 'addFriend'">
@@ -55,6 +55,7 @@
             </template>
             <template v-else-if="item.type == 'agreeFriend'">
               <span class="noticeContent" v-if="item.agreed == 2"> {{item.fromUser.user_name}} 同意了您的好友请求</span>
+              <span class="noticeContent" v-if="item.agreed == 3"> {{item.fromUser.user_name}} 拒绝了您的好友请求</span>
               <div class="listInfo">
                 <div class="time">
                   {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
@@ -75,7 +76,7 @@
         <div v-else class="noData">
           <p>暂无通知</p>
         </div>
-        <el-badge :value="notice.length" class="item"  slot="reference">
+        <el-badge :value="total" class="item"  slot="reference">
           <i class="icon el-icon-bell"></i>
         </el-badge>
         <!-- <i slot="reference" class="icon el-icon-bell"></i> -->
@@ -99,6 +100,11 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 export default {
+  // sockets: {
+  //   login(value) {
+  //     console.log("login");
+  //   }
+  // },
   data() {
     var validateName = (rule, value, callback) => {
       var user = JSON.parse(localStorage.getItem("user"));
@@ -164,13 +170,20 @@ export default {
   created() {
     this.getNotice();
   },
-  mounted() {},
+  mounted() {
+    this.$socket.on("newReplayNotice", res => {
+      this.$store.dispatch("newReplayNotice", res);
+    });
+    this.$socket.on("newNotice", res => {
+      this.$store.dispatch("newNotice", res);
+    });
+  },
   methods: {
     cancelPwd() {
       this.pwdForm = {
         oldpwd: "",
         newpwd: ""
-      }
+      };
       this.dialogPwdVisible = false;
     },
     submitPwd(formName) {
@@ -252,14 +265,18 @@ export default {
       window.open(href, "_blank");
     },
     agreeFriend(item, index, agreed) {
-      this.$store.dispatch("updateNotice", {
-        item: item,
-        index: index,
-        from_id: item.fromUser._id,
-        type: item.type,
-        _id: item._id,
-        agreed: agreed
-      });
+      var self = this
+      this.$store
+        .dispatch("updateNotice", {
+          item: item,
+          index: index,
+          from_id: item.fromUser._id,
+          type: item.type,
+          _id: item._id,
+          agreed: agreed,
+          self: self
+        })
+
     },
     handleClick(type, event) {
       // console.log(type, event)
@@ -272,6 +289,10 @@ export default {
     },
     handleCommand(command) {
       if (command == "logout") {
+        this.$socket.emit(
+          "logout",
+          JSON.parse(localStorage.getItem("user"))._id
+        );
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         this.$router.push("/login");

@@ -14,6 +14,7 @@ export const LOGIN = 'LOGIN'
 //notice
 export const SET_NOTICE = 'SET_NOTICE'
 export const UPDATE_NOTICE = 'UPDATE_NOTICE'
+export const ADD_NOTICE = 'ADD_NOTICE'
 
 //friend
 

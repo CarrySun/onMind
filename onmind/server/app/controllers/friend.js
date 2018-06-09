@@ -104,10 +104,16 @@ exports.add = async (ctx, next) => {
             };
             return next;
           }
+          ctx.body = {
+            success: true,
+            data: {
+              notice: notice,
+              to: toUser._id
+            }
+          };
         } else {
-          console.log("已发送过好友请求");
+          ctx.body = { success: false, err: "已发送过好友请求了哦" };
         }
-        ctx.body = { success: true };
       }
     }
   } else {
@@ -211,6 +217,7 @@ exports.addPartner = async (ctx, next) => {
     }
   }
   ctx.body = {
-    success: true
+    success: true,
+    data: notice
   };
 };

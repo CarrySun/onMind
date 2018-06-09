@@ -28,26 +28,27 @@ exports.update = async (ctx, next) => {
   var user = ctx.session.user;
   var notice = await Notice.findOne({ _id: body._id }).exec();
   if (notice) {
-    if (body.type == 'addFriend') {
+    var friend
+    if (body.type == "addFriend") {
       notice.agreed = body.agreed;
+      try {
+        notice = await notice.save();
+      } catch (e) {
+        console.log(e);
+        ctx.body = {
+          success: false,
+          err: e
+        };
+        return next;
+      }
       //同意 添加好友
       if (body.agreed == 2) {
-        var friend = new Friend({
+        friend = new Friend({
           answer_id: user._id,
           ask_id: body.from_id
-        })
+        });
         try {
           friend = await friend.save();
-          try {
-            notice = await notice.save();
-          } catch (e) {
-            console.log(e);
-            ctx.body = {
-              success: false,
-              err: e
-            };
-            return next;
-          }
         } catch (e) {
           console.log(e);
           ctx.body = {
@@ -56,6 +57,9 @@ exports.update = async (ctx, next) => {
           };
           return next;
         }
+        friend = await Friend.findOne({ _id: friend._id })
+          .populate("answer_id", userFields.join(" "))
+          .populate("ask_id", userFields.join(" "));
       }
       //同意或拒绝 通知请求方
       var newNotice = new Notice({
@@ -63,7 +67,7 @@ exports.update = async (ctx, next) => {
         fromUser: user._id,
         type: "agreeFriend",
         agreed: body.agreed
-      })
+      });
       try {
         newNotice = await newNotice.save();
       } catch (e) {
@@ -75,13 +79,11 @@ exports.update = async (ctx, next) => {
         return next;
       }
     }
-    friend = await Friend.findOne({ _id: friend._id })
-      .populate("answer_id", userFields.join(" "))
-      .populate("ask_id", userFields.join(" "))
     ctx.body = {
       data: {
         friend: friend,
-        notice: notice
+        notice: notice,
+        to: body.from_id,
       },
       success: true
     };
@@ -143,7 +145,6 @@ exports.update = async (ctx, next) => {
 //     success: true
 //   };
 // };
-
 
 // exports.getData = async (ctx, next) => {
 //   var body = ctx.request.body;

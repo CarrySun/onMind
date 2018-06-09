@@ -201,11 +201,40 @@ export default {
     addFriend() {
       var self = this;
       this.sending = true;
-      this.$store.dispatch("addFriend", {
-        self: self,
-        type: self.type,
-        friend: self.friendName
-      });
+      this.$store
+        .dispatch("addFriend", {
+          type: self.type,
+          friend: self.friendName
+        })
+        .then(function(res) {
+          self.sending = false;
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.$message({
+                message: "已成功发送加好友请求",
+                type: "success"
+              });
+              self.$socket.emit("newNotice", {
+                to: data.data.to,
+                notice: data.data.notice
+              });
+            }
+          }
+        })
+        .catch(err => {
+          self.sending = false;
+          console.log(err);
+          self.$message({
+            message: "操作失败，请重试",
+            type: "error"
+          });
+        });
     },
     handleCurrentChange(val) {
       this.cur_page = val;

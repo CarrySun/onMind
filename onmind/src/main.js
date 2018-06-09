@@ -1,4 +1,9 @@
 import Vue from "vue";
+import VueSocketio from "vue-socket.io";
+import socketio from "socket.io-client";
+
+Vue.use(VueSocketio, socketio("http://localhost:3000/"), Store)
+
 import App from "./App";
 import router from "./router";
 import Store from "./store/index.js";
@@ -10,14 +15,13 @@ Vue.use(ElementUI);
 router.beforeEach((to, from, next) => {
   // console.log(localStorage.getItem('accessToken'))
   if (to.meta.auth) {
-    if (to.name == 'login') {
-      if (localStorage.getItem('accessToken')) {
+    if (to.name == "login") {
+      if (localStorage.getItem("accessToken")) {
         next({ path: "/owner" });
-      }else {
+      } else {
         next();
       }
-    }
-    else if (localStorage.getItem('accessToken')) {
+    } else if (localStorage.getItem("accessToken")) {
       next();
     } else {
       next({ path: "/login", query: { Rurl: to.name } });
@@ -26,11 +30,14 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-const moment = require('moment')
-require('moment/locale/zh-cn')
-Vue.use(require('vue-moment'), {
+
+// , Store);
+
+const moment = require("moment");
+require("moment/locale/zh-cn");
+Vue.use(require("vue-moment"), {
   moment
-})
+});
 
 new Vue({
   router,

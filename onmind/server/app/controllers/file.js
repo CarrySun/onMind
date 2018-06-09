@@ -60,6 +60,7 @@ exports.add = async (ctx, next) => {
         });
         try {
           notice = await notice.save();
+          socket.emit("newNotice", { notive: notice });
         } catch (e) {
           console.log(e);
           ctx.body = {
@@ -208,6 +209,7 @@ exports.update = async (ctx, next) => {
           });
           try {
             notice = await notice.save();
+            socket.emit("newNotice", { notive: notice });
           } catch (e) {
             console.log(e);
             ctx.body = {
@@ -256,8 +258,8 @@ exports.addEditingUser = async (ctx, next) => {
     if (!file.editingUser) {
       file.editingUser = [];
     }
-    console.log(file.editingUser.indexOf(user._id))
-    if (file.editingUser.indexOf(user._id) == -1){
+    console.log(file.editingUser.indexOf(user._id));
+    if (file.editingUser.indexOf(user._id) == -1) {
       file.editingUser.push(user._id);
     }
     try {
@@ -293,7 +295,7 @@ exports.removeEditingUser = async (ctx, next) => {
       file.editingUser = [];
     }
     for (var i = 0; i < file.editingUser.length; i++) {
-      if (file.editingUser[i].toString()  == user._id) {
+      if (file.editingUser[i].toString() == user._id) {
         file.editingUser.splice(i, 1);
         break;
       }

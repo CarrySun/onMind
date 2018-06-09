@@ -11,12 +11,28 @@
 </template>
 
 <script>
-import vHead from './Header.vue'
-import vSidebar from './Sidebar.vue'
+import vHead from "./Header.vue";
+import vSidebar from "./Sidebar.vue";
 export default {
   components: {
     vHead,
     vSidebar
+  },
+  mounted() {
+    this.socketConnect();
+  },
+  sockets: {
+    login(value) {
+      console.log(value);
+    }
+  },
+  methods: {
+    socketConnect() {
+      var accessToken = localStorage.getItem("accessToken");
+      if (accessToken) {
+        this.$socket.emit("log", JSON.parse(localStorage.getItem("user"))._id);
+      }
+    }
   }
-}
+};
 </script>

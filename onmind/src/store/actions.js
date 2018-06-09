@@ -1,5 +1,3 @@
-// 分发actions，页面的action同意dispatch到此进行逻辑处理
-
 import * as types from "./mutation-types.js";
 import * as apis from "@/assets/js/api.js";
 import common from "@/assets/js/common.js";
@@ -55,83 +53,27 @@ export default {
   },
   //reg
   async reg({ dispatch, commit }, formdata) {
-    var self = formdata.self;
     if (
       formdata.user_email &&
       formdata.user_name &&
       formdata.user_password &&
       formdata.verifyCode
     ) {
-      await apis
-        .regApi({
-          user_email: formdata.user_email,
-          user_name: formdata.user_name,
-          user_password: formdata.user_password,
-          verifyCode: formdata.verifyCode
-        })
-        .then(function(res) {
-          self.reging = false;
-          if (res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              self.$message({
-                message: "恭喜你!注册成功",
-                type: "success"
-              });
-              localStorage.setItem("user", JSON.stringify(data.user));
-              localStorage.setItem("accessToken", data.user.accessToken);
-              self.$router.push("/owner");
-            }
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          self.$message({
-            message: "注册失败，请重试",
-            type: "error"
-          });
-          self.reging = false;
-        });
+      return await apis.regApi({
+        user_email: formdata.user_email,
+        user_name: formdata.user_name,
+        user_password: formdata.user_password,
+        verifyCode: formdata.verifyCode
+      });
     }
   },
   //log
   async log({ dispatch, commit }, formdata) {
-    var self = formdata.self;
     if (formdata.user_email && formdata.user_password) {
-      await apis
-        .logApi({
-          user_email: formdata.user_email,
-          user_password: formdata.user_password
-        })
-        .then(function(res) {
-          self.loging = false;
-          if (res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              localStorage.setItem("user", JSON.stringify(data.user));
-              localStorage.setItem("accessToken", data.user.accessToken);
-              self.$router.push("/owner");
-            }
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          self.$message({
-            message: "登陆失败，请重试",
-            type: "error"
-          });
-          self.loging = false;
-        });
+      return await apis.logApi({
+        user_email: formdata.user_email,
+        user_password: formdata.user_password
+      });
     }
   },
   //verifyForget
@@ -504,7 +446,7 @@ export default {
       accessToken: localStorage.getItem("accessToken")
     };
 
-    return await apis.addEditingUserApi(data)
+    return await apis.addEditingUserApi(data);
   },
   async removeEditingUser({ dispatch, commit }, formdata) {
     var data = {
@@ -512,7 +454,7 @@ export default {
       accessToken: localStorage.getItem("accessToken")
     };
 
-    return await apis.removeEditingUserApi(data)
+    return await apis.removeEditingUserApi(data);
   },
 
   // friend
@@ -579,39 +521,11 @@ export default {
       });
   },
   async addFriend({ dispatch, commit }, formdata) {
-    var self = formdata.self;
-    await apis
-      .addFriendApi({
-        type: formdata.type,
-        friend: formdata.friend,
-        accessToken: localStorage.getItem("accessToken")
-      })
-      .then(function(res) {
-        self.sending = false;
-        if (res.data) {
-          var data = res.data;
-          if (!data.success) {
-            self.$message({
-              // message: "操作失败，请重试",
-              message: data.err,
-              type: "error"
-            });
-          } else if (data.success) {
-            self.$message({
-              message: "已成功发送加好友请求",
-              type: "success"
-            });
-          }
-        }
-      })
-      .catch(err => {
-        self.sending = false;
-        console.log(err);
-        self.$message({
-          message: "操作失败，请重试",
-          type: "error"
-        });
-      });
+    return await apis.addFriendApi({
+      type: formdata.type,
+      friend: formdata.friend,
+      accessToken: localStorage.getItem("accessToken")
+    });
   },
   async delFriend({ dispatch, commit }, formdata) {
     var self = formdata.self;
@@ -678,6 +592,13 @@ export default {
       });
   },
   //notice
+  async newReplayNotice({ dispatch, commit }, formdata) {
+    commit(types.ADD_NOTICE, formdata.notice);
+    commit(types.ADD_FRIEND, formdata.friend);
+  },
+  async newNotice({ dispatch, commit }, formdata) {
+    commit(types.ADD_NOTICE, formdata.notice);
+  },
   async noticeList({ dispatch, commit }, formdata) {
     var self = formdata.self;
     await apis
@@ -706,6 +627,7 @@ export default {
       });
   },
   async updateNotice({ dispatch, commit }, formdata) {
+    var self = formdata.self;
     var data = {
       from_id: formdata.from_id,
       type: formdata.type,
@@ -716,6 +638,11 @@ export default {
 
     await apis.updateNoticeApi(data).then(res => {
       if (res.data.success) {
+        self.$socket.emit("newReplayNotice", {
+          to: res.data.data.to,
+          notice: res.data.data.notice,
+          friend: res.data.data.friend,
+        });
         commit(types.ADD_FRIEND, res.data.data.friend);
         var item = common.cloneObj(formdata.item);
         item.agreed = formdata.agreed;
@@ -726,5 +653,5 @@ export default {
         commit(types.UPDATE_NOTICE, res);
       }
     });
-  },
+  }
 };

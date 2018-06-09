@@ -88,7 +88,7 @@ exports.add = async (ctx, next) => {
     success: true,
     file: file,
     tos: file_partner,
-    notice: notice,
+    notice: notice
   };
 };
 
@@ -241,7 +241,7 @@ exports.update = async (ctx, next) => {
       success: true,
       file: file,
       tos: file_partner,
-      notice: notice,
+      notice: notice
     };
   } else {
     ctx.body = {
@@ -259,13 +259,13 @@ exports.addEditingUser = async (ctx, next) => {
   });
   if (file) {
     file.isEdit = true;
-    if (!file.editingUser) {
-      file.editingUser = [];
-    }
-    console.log(file.editingUser.indexOf(user._id));
-    if (file.editingUser.indexOf(user._id) == -1) {
-      file.editingUser.push(user._id);
-    }
+    file.editingUser = user._id;
+    // if (!file.editingUser) {
+    //   file.editingUser = [];
+    // }
+    // if (file.editingUser.indexOf(user._id) == -1) {
+    //   file.editingUser.push(user._id);
+    // }
     try {
       file = await file.save();
     } catch (e) {
@@ -294,16 +294,17 @@ exports.removeEditingUser = async (ctx, next) => {
     _id: file_id
   });
   if (file) {
-    file.isEdit = true;
-    if (!file.editingUser) {
-      file.editingUser = [];
-    }
-    for (var i = 0; i < file.editingUser.length; i++) {
-      if (file.editingUser[i].toString() == user._id) {
-        file.editingUser.splice(i, 1);
-        break;
-      }
-    }
+    file.isEdit = false;
+    file.editingUser = null;
+    // if (!file.editingUser) {
+    //   file.editingUser = [];
+    // }
+    // for (var i = 0; i < file.editingUser.length; i++) {
+    //   if (file.editingUser[i].toString() == user._id) {
+    //     file.editingUser.splice(i, 1);
+    //     break;
+    //   }
+    // }
     try {
       file = await file.save();
     } catch (e) {
@@ -330,6 +331,7 @@ exports.getData = async (ctx, next) => {
   var file = await File.findOne({ _id: body._id })
     .populate("editingUser", userFields.join(" "))
     .exec();
+    console.log(file)
   if (file) {
     ctx.body = {
       success: true,

@@ -138,7 +138,7 @@
         }else{
             r = 0;
         }
-        //logger.debug(i1+' <> '+i2+'  =  '+r);
+        // logger.debug(i1+' <> '+i2+'  =  '+r);
         return r;
     };
 
@@ -790,7 +790,7 @@
                     var topic_child = null;
                     for(var i=0;i<topic_children.length;i++){
                         topic_child = topic_children[i];
-                        //logger.debug(topic_child.tagName);
+                        // logger.debug(topic_child.tagName);
                         if(topic_child.nodeType == 1 && topic_child.tagName === 'richcontent'){
                             node_topic = topic_child.textContent;
                             break;
@@ -806,7 +806,7 @@
                 if(!!node_position){
                     node_direction = node_position=='left'?jm.direction.left:jm.direction.right;
                 }
-                //logger.debug(node_position +':'+ node_direction);
+                // logger.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
                     mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction, node_expanded);
                 }else{
@@ -1287,17 +1287,17 @@
                 logger.error('data.load error');
                 return;
             }else{
-                logger.debug('data.load ok');
+                // logger.debug('data.load ok');
             }
 
             this.view.load();
-            logger.debug('view.load ok');
+            // logger.debug('view.load ok');
 
             this.layout.layout();
-            logger.debug('layout.layout ok');
+            // logger.debug('layout.layout ok');
 
             this.view.show(true);
-            logger.debug('view.show ok');
+            // logger.debug('view.show ok');
 
             this.invoke_event_handle(jm.event_type.show,{data:[mind]});
         },
@@ -1413,7 +1413,7 @@
         },
 
         update_node:function(nodeid, topic){
-          console.log('update')
+          // console.log('update')
             if(this.get_editable()){
                 if(jm.util.text.is_empty(topic)){
                     logger.warn('fail, topic can not be empty');
@@ -1678,11 +1678,11 @@
 
     jm.data_provider.prototype={
         init:function(){
-            logger.debug('data.init');
+            // logger.debug('data.init');
         },
 
         reset:function(){
-            logger.debug('data.reset');
+            // logger.debug('data.reset');
         },
 
         load:function(mind_data){
@@ -1738,14 +1738,14 @@
 
     jm.layout_provider.prototype={
         init:function(){
-            logger.debug('layout.init');
+            // logger.debug('layout.init');
         },
         reset:function(){
-            logger.debug('layout.reset');
+            // logger.debug('layout.reset');
             this.bounds = {n:0,s:0,w:0,e:0};
         },
         layout:function(){
-            logger.debug('layout.layout');
+            // logger.debug('layout.layout');
             this.layout_direction();
             this.layout_offset();
         },
@@ -1842,7 +1842,7 @@
             layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
             this.bounds.e=node._data.view.width/2;
             this.bounds.w=0-this.bounds.e;
-            //logger.debug(this.bounds.w);
+            // logger.debug(this.bounds.w);
             this.bounds.n=0;
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
         },
@@ -1929,8 +1929,8 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //logger.debug(node.topic);
-                //logger.debug(node._data.layout.offset_y);
+                // logger.debug(node.topic);
+                // logger.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
@@ -1961,11 +1961,11 @@
         get_node_point:function(node){
             var view_data = node._data.view;
             var offset_p = this.get_node_offset(node);
-            //logger.debug(offset_p);
+            // logger.debug(offset_p);
             var p = {};
             p.x = offset_p.x + view_data.width*(node._data.layout.direction-1)/2;
             p.y = offset_p.y-view_data.height/2;
-            //logger.debug(p);
+            // logger.debug(p);
             return p;
         },
 
@@ -1992,8 +1992,8 @@
                     var offset_p = this.get_node_offset(node);
                     pout_cache.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
                     pout_cache.y = offset_p.y;
-                    //logger.debug('pout');
-                    //logger.debug(pout_cache);
+                    // logger.debug('pout');
+                    // logger.debug(pout_cache);
                 }
             }
             return pout_cache;
@@ -2018,7 +2018,7 @@
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 pout = this.get_node_point_out(node);
-                //logger.debug(pout.x);
+                // logger.debug(pout.x);
                 if(pout.x > this.bounds.e){this.bounds.e = pout.x;}
                 if(pout.x < this.bounds.w){this.bounds.w = pout.x;}
             }
@@ -2182,7 +2182,7 @@
 
     jm.view_provider.prototype={
         init:function(){
-            logger.debug('view.init');
+            // logger.debug('view.init');
 
             this.container = $i(this.opts.container) ? this.opts.container : $g(this.opts.container);
             if(!this.container){
@@ -2247,7 +2247,7 @@
         },
 
         reset:function(){
-            logger.debug('view.reset');
+            // logger.debug('view.reset');
             this.selected_node = null;
             this.clear_lines();
             this.clear_nodes();
@@ -2271,7 +2271,7 @@
         },
 
         load:function(){
-            logger.debug('view.load');
+            // logger.debug('view.load');
             this.init_nodes();
         },
 
@@ -2518,7 +2518,7 @@
         },
 
         show:function(keep_center){
-            logger.debug('view.show');
+            // logger.debug('view.show');
             this.expand_size();
             this._show();
             if(!!keep_center){

@@ -24,9 +24,9 @@
         </div>
         <div class="save">
           <!-- {{saveState}} -->
-           <el-tag v-if="fileData.editingUser && fileData.editingUser.length > 0">
+           <el-tag v-if="fileData.editingUser">
           <!-- <p > -->
-            <span v-for="(item,index) in fileData.editingUser" :key="index">{{item.user_name}}</span>
+            <span>{{fileData.editingUser.user_name}}</span>
             正在编辑
           </el-tag>
           <!-- </p> -->
@@ -234,33 +234,9 @@ export default {
         decodeURI(document.location.toString()),
         "id"
       );
-      this.$store
-        .dispatch("getFileData", {
-          _id: id
-        })
-        .then(function(res) {
-          self.loading = false;
-          if (res && res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              self.fileData = data.data;
-              self.load_jsmind();
-            }
-          }
-        })
-        .catch(err => {
-          self.loading = false;
-          console.log(err);
-          self.$message({
-            message: "操作失败，请重试",
-            type: "error"
-          });
-        });
+      return this.$store.dispatch("getFileData", {
+        _id: id
+      });
     },
     handleCommand(command) {
       if (command == "logout") {
@@ -270,6 +246,12 @@ export default {
       }
     },
     load_jsmind() {
+      jm = "";
+      var child = document.getElementsByClassName("jsmind-inner")[0];
+      var parent = document.getElementById("jsmind_container");
+      if (child) {
+        parent.removeChild(child);
+      }
       var editor = document.getElementById("editor");
       editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
       editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
@@ -299,17 +281,13 @@ export default {
       }
       var options = {
         container: "jsmind_container",
-        editable: true,
+        editable: this.editable,
         theme: "primary"
       };
       jm = jsMind.show(options, mind);
       var user = JSON.parse(localStorage.getItem("user"));
       var flag = true;
-      if (
-        this.fileData.editingUser &&
-        this.fileData.editingUser.length > 0 &&
-        this.fileData.editingUser.indexOf(user._id) == -1
-      ) {
+      if (this.fileData.editingUser && this.fileData.editingUser == user._id) {
         flag = false;
       }
       if (flag) {
@@ -319,7 +297,7 @@ export default {
         this.editable = false;
         jm.disable_edit();
       }
-      // var mind_data = jm.get_data();
+      var mind_data = jm.get_data();
       // console.log(mind_data);
       // jm.set_readonly(true);
       // jm.add_node("sub2", "sub23", "new node", { "background-color": "red" });
@@ -347,23 +325,86 @@ export default {
     },
     //右键菜单
     showMenu: function(event) {
+      event.preventDefault();
+      var self = this;
+      var _id = JSON.parse(localStorage.getItem("user"))._id;
+      //可编辑
       if (this.editable) {
-        if (event.target.nodeName == "JMNODE") {
-          var x = event.clientX;
-          var y = event.clientY;
-          this.menuData.axios = {
-            x,
-            y
-          };
-          event.cancelBubble = true;
-          event.preventDefault();
+        //可编辑 我正在编辑
+        if (this.fileData.editingUser && this.fileData.editingUser._id == _id) {
+          // console.log(1);
+          if (event.target.nodeName == "JMNODE") {
+            var x = event.clientX;
+            var y = event.clientY;
+            self.menuData.axios = {
+              x,
+              y
+            };
+            event.cancelBubble = true;
+          }
+        } else if (
+          this.fileData.editingUser &&
+          this.fileData.editingUser._id != _id
+        ) {
+          // console.log(2);
+          //可编辑 别人正在编辑
+          this.$message({
+            type: "error",
+            message: self.fileData.editingUser.user_name + "正在编辑"
+          });
+        } else if (!this.fileData.editingUser) {
+          //不确定
+          this.loadData()
+            .then(function(res) {
+              self.loading = false;
+              if (res && res.data) {
+                var data = res.data;
+                if (!data.success) {
+                  self.$message({
+                    message: data.err,
+                    type: "error"
+                  });
+                } else if (data.success) {
+                  self.fileData = data.data;
+                  if (data.data.isEdit) {
+                    //有人编辑
+                    // console.log(3);
+                    self.editable = false;
+
+                    self.$message({
+                      type: "error",
+                      message: self.fileData.editingUser.user_name + "正在编辑"
+                    });
+                  } else {
+                    //真的没人编辑
+                    // console.log(4);
+                    if (event.target.nodeName == "JMNODE") {
+                      var x = event.clientX;
+                      var y = event.clientY;
+                      self.menuData.axios = {
+                        x,
+                        y
+                      };
+                      event.cancelBubble = true;
+                    }
+                  }
+                }
+              }
+            })
+            .catch(err => {
+              self.loading = false;
+              console.log(err);
+              self.$message({
+                message: "操作失败，请重试",
+                type: "error"
+              });
+            });
         }
       } else {
         this.$message({
           type: "error",
-          message: "当前无法编辑"
+          message: self.fileData.editingUser.user_name + "正在编辑"
         });
-        event.preventDefault();
       }
     },
     //保存更改
@@ -400,6 +441,25 @@ export default {
         .then(res => {
           if (res.data.success) {
             self.fileData = res.data.data;
+            var partner = res.data.data.file_partner.concat();
+            var owner = res.data.data.file_owner;
+            var tos = [];
+            var _id = JSON.parse(localStorage.getItem("user"))._id;
+            if (_id == owner) {
+              tos = partner.concat();
+            } else {
+              var index = partner.indexOf(_id);
+              tos.push(owner);
+              for (var i in partner) {
+                if (i != index) {
+                  tos.push(partner[i]);
+                }
+              }
+            }
+            self.$socket.emit("addEditingUser", {
+              tos: tos,
+              editingUser: res.data.data.editingUser
+            });
           } else {
             self.$message({
               type: "error",
@@ -420,6 +480,24 @@ export default {
         .then(res => {
           if (res.data.success) {
             self.fileData = res.data.data;
+            var partner = res.data.data.file_partner.concat();
+            var owner = res.data.data.file_owner;
+            var tos = [];
+            var _id = JSON.parse(localStorage.getItem("user"))._id;
+            if (_id == owner) {
+              tos = partner.concat();
+            } else {
+              var index = partner.indexOf(_id);
+              tos.push(owner);
+              for (var i in partner) {
+                if (i != index) {
+                  tos.push(partner[i]);
+                }
+              }
+            }
+            self.$socket.emit("removeEditingUser", {
+              tos: tos
+            });
           } else {
             self.$message({
               type: "error",
@@ -460,7 +538,6 @@ export default {
     },
     //编辑节点
     editNode() {
-      console.log("edit");
       var selected_node = jm.get_selected_node();
       if (!!selected_node) {
         jm.begin_edit(selected_node);
@@ -490,15 +567,76 @@ export default {
       }
     },
     beforeunloadHandler(e) {
-      this.removeEditingUser()
+      this.removeEditingUser();
     }
   },
   created: function() {
-    this.loadData();
+    var self = this;
+    this.loadData()
+      .then(function(res) {
+        self.loading = false;
+        if (res && res.data) {
+          var data = res.data;
+          if (!data.success) {
+            self.$message({
+              message: data.err,
+              type: "error"
+            });
+          } else if (data.success) {
+            self.fileData = data.data;
+            self.load_jsmind();
+          }
+        }
+      })
+      .catch(err => {
+        self.loading = false;
+        console.log(err);
+        self.$message({
+          message: "操作失败，请重试",
+          type: "error"
+        });
+      });
   },
   mounted() {
+    const self = this;
     this.addEventListeners();
-    window.addEventListener("beforeunload", e => this.beforeunloadHandler(e));
+    window.addEventListener("beforeunload", e => self.beforeunloadHandler(e));
+    window.addEventListener("onunload", e => self.beforeunloadHandler(e));
+    this.$socket.on("addEditingUser", res => {
+      console.log("addEditingUser");
+      self.editable = false;
+      self.fileData.editingUser = res.editingUser;
+      self.fileData.isEdit = true;
+    });
+    this.$socket.on("removeEditingUser", res => {
+      console.log("removeEditingUser");
+      self.editable = true;
+      self.fileData.editingUser = null;
+      self.loadData()
+        .then(function(res) {
+          self.loading = false;
+          if (res && res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.fileData = data.data;
+              self.load_jsmind();
+            }
+          }
+        })
+        .catch(err => {
+          self.loading = false;
+          console.log(err);
+          self.$message({
+            message: "操作失败，请重试",
+            type: "error"
+          });
+        });
+    });
   },
 
   destroyed() {

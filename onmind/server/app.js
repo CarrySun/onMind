@@ -122,4 +122,26 @@ io.on("connection", function(socket) {
       }
     }
   });
+  socket.on("addEditingUser", function (res) {
+    console.log("addEditingUser");
+    for (var i in res.tos) {
+      if (res.tos[i] in usocket) {
+        console.log("在线");
+        usocket[res.tos[i]].emit("addEditingUser", res);
+      } else {
+        console.log(res.tos[i] + "不在线 收不到消息");
+      }
+    }
+  });
+  socket.on("removeEditingUser", function (res) {
+    console.log("removeEditingUser");
+    for (var i in res.tos) {
+      if (res.tos[i] in usocket) {
+        usocket[res.tos[i]].emit("removeEditingUser", res);
+      } else {
+        console.log(res.tos[i] + "不在线 收不到消息");
+      }
+    }
+  });
+
 });

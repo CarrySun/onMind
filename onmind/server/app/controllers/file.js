@@ -60,7 +60,7 @@ exports.add = async (ctx, next) => {
         });
         try {
           notice = await notice.save();
-          socket.emit("newNotice", { notive: notice });
+          // socket.emit("newNotice", { notive: notice });
         } catch (e) {
           console.log(e);
           ctx.body = {
@@ -86,7 +86,9 @@ exports.add = async (ctx, next) => {
     .exec();
   ctx.body = {
     success: true,
-    file: file
+    file: file,
+    tos: file_partner,
+    notice: notice,
   };
 };
 
@@ -209,7 +211,7 @@ exports.update = async (ctx, next) => {
           });
           try {
             notice = await notice.save();
-            socket.emit("newNotice", { notive: notice });
+            // socket.emit("newNotice", { notive: notice });
           } catch (e) {
             console.log(e);
             ctx.body = {
@@ -237,7 +239,9 @@ exports.update = async (ctx, next) => {
     }
     ctx.body = {
       success: true,
-      data: file
+      file: file,
+      tos: file_partner,
+      notice: notice,
     };
   } else {
     ctx.body = {

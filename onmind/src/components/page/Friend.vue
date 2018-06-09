@@ -144,12 +144,32 @@ export default {
           uncheck.push(self.tableData[i].file_title);
         }
       }
-      this.$store.dispatch("addPartner", {
-        self: self,
-        checked: checked,
-        uncheck: uncheck,
-        file_partner: self.activeFriendId
-      });
+      this.$store
+        .dispatch("addPartner", {
+          checked: checked,
+          uncheck: uncheck,
+          file_partner: self.activeFriendId
+        })
+        .then(function(res) {
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.cancel();
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          self.$message({
+            type: "error",
+            message: "操作失败，请重试!"
+          });
+        });
     },
     getFileData() {
       let self = this;

@@ -187,49 +187,15 @@ export default {
     return data;
   },
   async addFile({ dispatch, commit }, formdata) {
-    var self = formdata.self;
     if (formdata.file_title && formdata.file_type) {
-      await apis
+      return await apis
         .addFileApi({
           file_title: formdata.file_title,
           file_type: formdata.file_type,
           file_partner: formdata.file_partner,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
-          self.cancel();
-          self.adding = false;
-          if (res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              self.$message({
-                message: "文件新建成功",
-                type: "success"
-              });
-              self.tableData.unshift(data.file);
-              self.dialogFormVisible = false;
-              let { href } = self.$router.resolve({
-                name: "file",
-                query: {
-                  id: data.file._id
-                }
-              });
-              window.open(href, "_blank");
-            }
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          self.$message({
-            message: "文件新建失败，请重试",
-            type: "error"
-          });
-        });
+
     }
   },
 
@@ -344,41 +310,13 @@ export default {
   },
 
   async updateFilePartner({ dispatch, commit }, formdata) {
-    // console.log(formdata);
-    var self = formdata.self;
     if (formdata._id && formdata.file_partner) {
-      await apis
+      return await apis
         .updateFileApi({
           _id: formdata._id,
           file_partner: formdata.file_partner,
           accessToken: localStorage.getItem("accessToken")
         })
-        .then(function(res) {
-          if (res.data) {
-            var data = res.data;
-            if (!data.success) {
-              self.$message({
-                message: data.err,
-                type: "error"
-              });
-            } else if (data.success) {
-              self.dialogPartnerVisible = false;
-              // var data = self.tableData.concat()
-              // data[formdata.index].file_partner = formdata.file_partner.concat()
-              // self.tableData = data.concat()
-              self.tableData[
-                formdata.index
-              ].file_partner = data.data.file_partner.concat();
-            }
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          self.$message({
-            type: "error",
-            message: "操作失败，请重试!"
-          });
-        });
     }
   },
   async updateFileTitle({ dispatch, commit }, formdata) {
@@ -561,8 +499,7 @@ export default {
       });
   },
   async addPartner({ dispatch, commit }, formdata) {
-    var self = formdata.self;
-    await apis
+    return await apis
       .addPartnerApi({
         _id: formdata._id,
         checked: formdata.checked,
@@ -570,34 +507,25 @@ export default {
         file_partner: formdata.file_partner,
         accessToken: localStorage.getItem("accessToken")
       })
-      .then(function(res) {
-        if (res.data) {
-          var data = res.data;
-          if (!data.success) {
-            self.$message({
-              message: data.err,
-              type: "error"
-            });
-          } else if (data.success) {
-            self.cancel();
-          }
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        self.$message({
-          type: "error",
-          message: "操作失败，请重试!"
-        });
-      });
+
   },
   //notice
   async newReplayNotice({ dispatch, commit }, formdata) {
     commit(types.ADD_NOTICE, formdata.notice);
     commit(types.ADD_FRIEND, formdata.friend);
+    var self = formdata.self
+    self.$message({
+      type: 'warning',
+      message: '您有一条新通知，记得查看哦'
+    })
   },
   async newNotice({ dispatch, commit }, formdata) {
     commit(types.ADD_NOTICE, formdata.notice);
+    var self = formdata.self
+    self.$message({
+      type: 'warning',
+      message: '您有一条新通知，记得查看哦'
+    })
   },
   async noticeList({ dispatch, commit }, formdata) {
     var self = formdata.self;

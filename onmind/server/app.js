@@ -64,7 +64,7 @@ io.on("connection", function(socket) {
       console.log("在线的人:");
       console.log(user);
     }
-    socket.emit("login", 'hello' + _id);
+    socket.emit("login", "hello" + _id);
   });
   socket.on("logout", function(_id) {
     console.log("------------------------走了一个人--------------------");
@@ -90,21 +90,36 @@ io.on("connection", function(socket) {
   });
 
   socket.on("newNotice", function(res) {
-    console.log(res)
+    console.log(res);
+    console.log("newNotice");
+
     if (res.to in usocket) {
-      console.log("在线")
+      console.log("在线");
       usocket[res.to].emit("newNotice", res);
     } else {
       console.log(res.to + "不在线 收不到消息");
     }
   });
-  socket.on("newReplayNotice", function (res) {
+  socket.on("newReplayNotice", function(res) {
+    console.log(res);
+    console.log("newReplayNotice");
     if (res.to in usocket) {
-      console.log("在线")
+      console.log("在线");
       usocket[res.to].emit("newReplayNotice", res);
     } else {
       console.log(res.to + "不在线 收不到消息");
     }
   });
-
+  socket.on("newPartner", function(res) {
+    console.log(res);
+    console.log("newPartner");
+    for (var i in res.tos) {
+      if (res.tos[i] in usocket) {
+        console.log("在线");
+        usocket[res.tos[i]].emit("newPartner", res);
+      } else {
+        console.log(res.tos[i] + "不在线 收不到消息");
+      }
+    }
+  });
 });

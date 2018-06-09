@@ -192,27 +192,94 @@ export default {
         index: 0,
         _id: ""
       };
-      this.dialogPartnerVisible = false
+      this.dialogPartnerVisible = false;
     },
     submitPartner() {
       var self = this;
-      this.$store.dispatch("updateFilePartner", {
-        self: self,
-        index: self.newPartner.index,
-        _id: self.newPartner._id,
-        file_partner: self.newPartner.file_partner
-      });
+      this.$store
+        .dispatch("updateFilePartner", {
+          index: self.newPartner.index,
+          _id: self.newPartner._id,
+          file_partner: self.newPartner.file_partner
+        })
+        .then(function(res) {
+          if (res.data) {
+            var data = res.data;
+            if (!data.success) {
+              self.$message({
+                message: data.err,
+                type: "error"
+              });
+            } else if (data.success) {
+              self.dialogPartnerVisible = false;
+              self.tableData[
+                self.newPartner.index
+              ].file_partner = data.file.file_partner.concat();
+              self.$socket.emit("newPartner", {
+                tos: data.tos,
+                notice: data.notice,
+                file: data.file
+              });
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          self.$message({
+            type: "error",
+            message: "操作失败，请重试!"
+          });
+        });
     },
     submit(formName) {
       const self = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$store.dispatch("addFile", {
-            file_title: this.newFile.file_title,
-            file_type: this.newFile.file_type,
-            file_partner: this.newFile.file_partner,
-            self: self
-          });
+          this.$store
+            .dispatch("addFile", {
+              file_title: this.newFile.file_title,
+              file_type: this.newFile.file_type,
+              file_partner: this.newFile.file_partner
+            })
+            .then(function(res) {
+              self.cancel();
+              self.adding = false;
+              if (res.data) {
+                var data = res.data;
+                if (!data.success) {
+                  self.$message({
+                    message: data.err,
+                    type: "error"
+                  });
+                } else if (data.success) {
+                  self.$message({
+                    message: "文件新建成功",
+                    type: "success"
+                  });
+                  self.tableData.unshift(data.file);
+                  self.dialogFormVisible = false;
+                  self.$socket.emit("newPartner", {
+                    tos: data.tos,
+                    notice: data.notice,
+                    file: data.file
+                  });
+                  // let { href } = self.$router.resolve({
+                  //   name: "file",
+                  //   query: {
+                  //     id: data.file._id
+                  //   }
+                  // });
+                  // window.open(href, "_blank");
+                }
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              self.$message({
+                message: "文件新建失败，请重试",
+                type: "error"
+              });
+            });
         } else {
           console.log("error submit!!");
           return false;
@@ -221,10 +288,12 @@ export default {
     },
     getData() {
       let self = this;
-      this.$store.dispatch("fileList", {
-        listType: "file_owner",
-        self: self
-      }).then(function(res) {
+      this.$store
+        .dispatch("fileList", {
+          listType: "file_owner",
+          self: self
+        })
+        .then(function(res) {
           self.loading = false;
           if (res.data) {
             var data = res.data;
@@ -281,8 +350,8 @@ export default {
     handlePartner(index, row) {
       this.dialogPartnerVisible = true;
       var arr = [];
-      for(var i in row.file_partner){
-        arr.push(row.file_partner[i].user_name)
+      for (var i in row.file_partner) {
+        arr.push(row.file_partner[i].user_name);
       }
       this.newPartner = {
         index: index,
@@ -291,8 +360,8 @@ export default {
       };
     },
     handleShare(index, row) {
-      this.dialogShareVisible = true
-      this.activeRow = row
+      this.dialogShareVisible = true;
+      this.activeRow = row;
       // this.$message("第" + (index + 1) + "行");
     },
     handleExport(index, row) {

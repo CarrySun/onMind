@@ -172,9 +172,15 @@ export default {
   },
   mounted() {
     this.$socket.on("newReplayNotice", res => {
+      res.self = this
       this.$store.dispatch("newReplayNotice", res);
     });
     this.$socket.on("newNotice", res => {
+      res.self = this
+      this.$store.dispatch("newNotice", res);
+    });
+    this.$socket.on("newPartner", res => {
+      res.self = this
       this.$store.dispatch("newNotice", res);
     });
   },

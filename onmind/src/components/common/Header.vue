@@ -71,6 +71,15 @@
                 </div>
               </div>
             </template>
+            <template v-else-if="item.type == 'addPartner' && !item.content">
+              <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
+              <div class="fileTitle" style="color:red;font-size:16px;">该文件已删除</div>
+              <div class="listInfo">
+                <div class="time">
+                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                </div>
+              </div>
+            </template>
           </li>
         </ul>
         <div v-else class="noData">

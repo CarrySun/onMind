@@ -324,7 +324,7 @@ export default {
                   localStorage.setItem("user", JSON.stringify(data.user));
                   localStorage.setItem("accessToken", data.user.accessToken);
                   self.$socket.emit("log", data.user._id);
-                  self.$router.push("/");
+                  self.$router.push("/owner");
                 }
               }
             })

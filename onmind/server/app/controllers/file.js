@@ -331,7 +331,6 @@ exports.getData = async (ctx, next) => {
   var file = await File.findOne({ _id: body._id })
     .populate("editingUser", userFields.join(" "))
     .exec();
-    console.log(file)
   if (file) {
     ctx.body = {
       success: true,

@@ -601,7 +601,7 @@ export default {
     const self = this;
     this.addEventListeners();
     window.addEventListener("beforeunload", e => self.beforeunloadHandler(e));
-    window.addEventListener("onunload", e => self.beforeunloadHandler(e));
+    // window.addEventListener("unload", e => self.beforeunloadHandler(e));
     this.$socket.on("addEditingUser", res => {
       console.log("addEditingUser");
       self.editable = false;
@@ -612,7 +612,8 @@ export default {
       console.log("removeEditingUser");
       self.editable = true;
       self.fileData.editingUser = null;
-      self.loadData()
+      self
+        .loadData()
         .then(function(res) {
           self.loading = false;
           if (res && res.data) {
@@ -637,12 +638,6 @@ export default {
           });
         });
     });
-  },
-
-  destroyed() {
-    window.removeEventListener("beforeunload", e =>
-      this.beforeunloadHandler(e)
-    );
   }
 };
 </script>

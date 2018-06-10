@@ -72,12 +72,26 @@ exports.add = async (ctx, next) => {
     } else {
       var flag = false;
       var friend = await Friend.find(
-        {},
+        // {},
         { ask_id: toUser._id },
         { answer_id: toUser._id }
       );
       console.log("friend");
-      console.log(friend.length);
+      console.log(friend);
+      // var answerFriend = await Friend.find({
+      //   ask_id: toUser._id
+      // })
+      // var askFriend = await Friend.find({
+      //   answer_id: toUser._id
+      // })
+      // if ((answerFriend && answerFriend.answer_id == fromUser._id) || (askFriend && askFriend.ask_id == fromUser._id)) {
+      //   ctx.body = { success: false, err: "他／她已经是你的好友了哦" };
+      // }
+
+      // console.log('answerFriend')
+      // console.log(answerFriend)
+      // console.log('askFriend')
+      // console.log(askFriend)
       if (friend.length > 0) {
         ctx.body = { success: false, err: "他／她已经是你的好友了哦" };
       } else {

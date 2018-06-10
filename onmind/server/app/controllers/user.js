@@ -145,7 +145,7 @@ exports.log = async (ctx, next) => {
   var hasEmail = await User.findOne({
     user_email: user_email
   }).exec();
-  if (hasEmail) {
+  if (hasEmail && hasEmail.verified) {
     var user = await User.findOne({
       user_email: user_email,
       user_password: user_password
@@ -161,10 +161,16 @@ exports.log = async (ctx, next) => {
         err: "密码错误"
       };
     }
-  } else {
+  } else if (!hasEmail) {
     ctx.body = {
       success: false,
       err: "邮箱未注册"
+    };
+  }
+  else if (hasEmail && !hasEmail.verified) {
+    ctx.body = {
+      success: false,
+      err: "邮箱验证未通过，请重新注册"
     };
   }
 };

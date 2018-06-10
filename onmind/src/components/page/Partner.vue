@@ -73,13 +73,13 @@ export default {
     }
   },
   mounted() {
-    this.$socket.on("newPartner", res => {
-      this.$message({
-        type: "warning",
-        message: "您有一条新通知，记得查看哦"
-      });
-      this.tableData.unshift(res.file);
-    });
+    // this.$socket.on("newPartner", res => {
+    //   this.$message({
+    //     type: "warning",
+    //     message: "您有一条新通知，记得查看哦"
+    //   });
+    //   this.tableData.unshift(res.file);
+    // });
   },
   methods: {
     getData() {

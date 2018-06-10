@@ -7,8 +7,24 @@ var User = mongoose.model("User");
 
 var userFields = ["_id", "user_name", "user_email"];
 var fileFields = ["_id", "file_title"];
-
+function cloneObj(obj) {
+  var str,
+    newobj = obj.constructor === Array ? [] : {};
+  if (typeof obj !== "object") {
+    return;
+  } else {
+    (str = JSON.stringify(obj)), //系列化对象
+      (newobj = JSON.parse(str)); //还原
+  }
+  //  else {
+  //   for (var i in obj) {
+  //     newobj[i] = typeof obj[i] === "object" ? cloneObj(obj[i]) : obj[i];
+  //   }
+  // }
+  return newobj;
+}
 exports.list = async (ctx, next) => {
+  var body = ctx.request.body;
   var user = ctx.session.user;
   var notice = await Notice.find({ toUser: user._id })
     .sort({
@@ -17,20 +33,38 @@ exports.list = async (ctx, next) => {
     .populate("fromUser", userFields.join(" "))
     .populate("content", fileFields.join(" "))
     .exec();
-  ctx.body = {
-    success: true,
-    data: notice,
-    total: notice.length
-  };
+  console.log(notice.constructor);
+  var oldNotice = cloneObj(notice)
+  ctx.body = { success: true, data: oldNotice, newNotice: newNotice, total: oldNotice.length };
+  if (body.flag) {
+    var newNotice = notice.concat()
+    console.log(newNotice)
+    for (var i = 0; i < newNotice.length; i++) {
+      if (!newNotice[i].readed && newNotice[i].type == "agreeFriend") {
+        newNotice[i].readed = true;
+        try {
+          await newNotice[i].save();
+        } catch (e) {
+          console.log(e);
+          ctx.body = {
+            success: true,
+            err: e
+          };
+          return next;
+        }
+      }
+    }
+  }
 };
 exports.update = async (ctx, next) => {
   var body = ctx.request.body;
   var user = ctx.session.user;
   var notice = await Notice.findOne({ _id: body._id }).exec();
   if (notice) {
-    var friend
+    var friend;
     if (body.type == "addFriend") {
       notice.agreed = body.agreed;
+      notice.readed = true;
       try {
         notice = await notice.save();
       } catch (e) {
@@ -83,7 +117,7 @@ exports.update = async (ctx, next) => {
       data: {
         friend: friend,
         notice: notice,
-        to: body.from_id,
+        to: body.from_id
       },
       success: true
     };
@@ -94,71 +128,21 @@ exports.update = async (ctx, next) => {
     };
   }
 };
-// exports.add = async (ctx, next) => {
-//   var body = ctx.request.body;
-//   var user = ctx.session.user;
-//   var file_partner = [];
-//   if (body.file_partner) {
-//     var file_partner = await User.findOne({ user_name: body.file_partner });
-//   }
-//   var file = new Notice({
-//     file_title: body.file_title,
-//     file_type: body.file_type,
-//     file_partner: file_partner,
-//     file_owner: user._id
-//   });
-//   try {
-//     file = await file.save();
-//   } catch (e) {
-//     console.log(e);
-//     ctx.body = {
-//       success: false,
-//       err: e
-//     };
-//     return next;
-//   }
-//   var id = file._id;
-//   file = await Notice.findOne({ _id: id })
-//     .populate("file_owner", userFields.join(" "))
-//     .exec();
-//   ctx.body = {
-//     success: true,
-//     file: file
-//   };
-// };
 
-// exports.delete = async (ctx, next) => {
-//   var body = ctx.request.body;
-//   var user = ctx.session.user;
-//   await Notice.remove({ _id: body._id });
-//   try {
-//     await Notice.remove({ _id: body._id });
-//   } catch (e) {
-//     console.log(e);
-//     ctx.body = {
-//       success: false,
-//       err: e
-//     };
-//     return next;
-//   }
-//   ctx.body = {
-//     success: true
-//   };
-// };
-
-// exports.getData = async (ctx, next) => {
-//   var body = ctx.request.body;
-//   var user = ctx.session.user;
-//   var file = await Notice.findOne({ _id: body._id }).exec();
-//   if (file) {
-//     ctx.body = {
-//       success: true,
-//       data: file
-//     };
-//   } else {
-//     ctx.body = {
-//       success: false,
-//       err: "该文件不存在"
-//     };
-//   }
-// };
+exports.recive = async (ctx, next) => {
+  var body = ctx.request.body;
+  var notice = await Notice.findOne({ _id: body._id }).exec();
+  notice.readed = true;
+  try {
+    notice = await notice.save();
+  } catch (e) {
+    ctx.body = {
+      success: false,
+      err: e
+    };
+    return next;
+  }
+  ctx.body = {
+    success: true
+  };
+};

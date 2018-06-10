@@ -12,12 +12,17 @@ var NoticeSchema = new Schema({
     type: ObjectId,
     ref: "User"
   },
+  //agreeFriend addFriend addPartner
   type: String,
   content: {
     type: ObjectId,
     ref: "File"
   },
-  agreed: {//1, 2, 3
+  readed: {
+    type: Boolean,
+    default: false
+  },
+  agreed: {//1, 2同意, 3拒绝
     type: Number,
     default: 1
   },

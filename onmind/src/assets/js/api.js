@@ -32,6 +32,7 @@ const ADD_PARTNER = HOST + "/friend/addPartner";
 
 const NOTICE_LIST = HOST + "/notice/list";
 const UPDATE_NOTICE = HOST + "/notice/update";
+const RECIVE_NOTICE = HOST + "/notice/recive";
 
 export function isNameRepeatApi(formData) {
   return axios.post(IS_NAME_REPEAT, formData);
@@ -120,4 +121,7 @@ export function noticeListApi(formData) {
 }
 export function updateNoticeApi(formData) {
   return axios.post(UPDATE_NOTICE, formData);
+}
+export function reciveNoticeApi(formData) {
+  return axios.post(RECIVE_NOTICE, formData);
 }

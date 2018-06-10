@@ -5,12 +5,12 @@
     </div>
     <div class="user-info">
       <el-dialog :before-close="cancel" title="个人信息修改" :visible.sync="dialogNameVisible" width="40%">
-        <el-form :model="userInfo" :rules="nameRules" ref="userInfo" label-width="0px" >
+        <el-form :model="userInfo" :rules="nameRules" ref="userInfo" label-width="0px">
           <el-form-item label="邮箱" :label-width="formLabelWidth">
-             <el-input disabled v-model="userInfo.user_email" auto-complete="off"></el-input>
+            <el-input disabled v-model="userInfo.user_email" auto-complete="off"></el-input>
           </el-form-item>
-           <el-form-item prop="user_name" label="用户名" :label-width="formLabelWidth">
-             <el-input v-model="userInfo.user_name" auto-complete="off" @keyup.enter.native="submit('userInfo')"></el-input>
+          <el-form-item prop="user_name" label="用户名" :label-width="formLabelWidth">
+            <el-input v-model="userInfo.user_name" auto-complete="off" @keyup.enter.native="submit('userInfo')"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -19,12 +19,12 @@
         </div>
       </el-dialog>
       <el-dialog :before-close="cancelPwd" title="修改密码" :visible.sync="dialogPwdVisible" width="40%">
-        <el-form :model="pwdForm" :rules="pwdRules" ref="pwdForm" label-width="0px" >
+        <el-form :model="pwdForm" :rules="pwdRules" ref="pwdForm" label-width="0px">
           <el-form-item prop="oldpwd" label="旧密码" :label-width="formLabelWidth">
-             <el-input type="password" v-model="pwdForm.oldpwd" auto-complete="off"></el-input>
+            <el-input type="password" v-model="pwdForm.oldpwd" auto-complete="off"></el-input>
           </el-form-item>
-           <el-form-item prop="newpwd" label="新密码" :label-width="formLabelWidth">
-             <el-input type="password" v-model="pwdForm.newpwd" auto-complete="off" @keyup.enter.native="submitPwd('pwdForm')"></el-input>
+          <el-form-item prop="newpwd" label="新密码" :label-width="formLabelWidth">
+            <el-input type="password" v-model="pwdForm.newpwd" auto-complete="off" @keyup.enter.native="submitPwd('pwdForm')"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -32,67 +32,125 @@
           <el-button type="primary" @click="submitPwd('pwdForm')">修 改</el-button>
         </div>
       </el-dialog>
-      <el-popover @show="getNotice" placement="bottom" width="350" trigger="click">
-        <ul v-if="total" class="hasData">
-          <li v-for="(item,index) in notice" :key="index">
-            <template v-if="item.type == 'addFriend'">
-              <span class="noticeContent"> {{item.fromUser.user_name}} 请求加您为好友</span>
-              <div class="listInfo">
-                <div class="time">
-                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
-                </div>
-                <div v-if="item.agreed == 1">
-                  <el-button size="mini" type="success" plain @click="agreeFriend(item,index, 2)">同意</el-button>
-                  <el-button size="mini" type="danger" plain @click="agreeFriend(item,index, 3)">拒绝</el-button>
-                </div>
-                <div v-else-if="item.agreed == 2">
-                  <el-button size="mini" type="success" plain disabled>已同意</el-button>
-                </div>
-                <div v-if="item.agreed == 3">
-                  <el-button size="mini" type="danger" plain disabled>已拒绝</el-button>
-                </div>
-              </div>
-            </template>
-            <template v-else-if="item.type == 'agreeFriend'">
-              <span class="noticeContent" v-if="item.agreed == 2"> {{item.fromUser.user_name}} 同意了您的好友请求</span>
-              <span class="noticeContent" v-if="item.agreed == 3"> {{item.fromUser.user_name}} 拒绝了您的好友请求</span>
-              <div class="listInfo">
-                <div class="time">
-                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
-                </div>
-              </div>
-            </template>
-            <template v-else-if="item.type == 'addPartner' && item.content">
-              <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
-              <div class="fileTitle" @click="handleInfo(item.content)">{{item.content.file_title}}</div>
-              <div class="listInfo">
-                <div class="time">
-                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
-                </div>
-              </div>
-            </template>
-            <template v-else-if="item.type == 'addPartner' && !item.content">
-              <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
-              <div class="fileTitle" style="color:red;font-size:16px;">该文件已删除</div>
-              <div class="listInfo">
-                <div class="time">
-                  {{item.updateTime | moment("YYYY-MM-DD HH:mm:ss")}}
-                </div>
-              </div>
-            </template>
-          </li>
-        </ul>
-        <div v-else class="noData">
-          <p>暂无通知</p>
-        </div>
-        <el-badge :value="total" class="item"  slot="reference">
+      <el-popover @show="getNotice(true)" @hide="getNotice()" placement="bottom" width="350" trigger="click">
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane label="未读消息" name="unread">
+            <ul v-if="unread.length>0" class="hasData">
+              <li v-for="(item,index) in unread" :key="index">
+                <template v-if="item.type == 'addFriend'">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 请求加您为好友</span>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                    <div v-if="item.agreed == 1">
+                      <el-button size="mini" type="success" plain @click="agreeFriend(item,index, 2)">同意</el-button>
+                      <el-button size="mini" type="danger" plain @click="agreeFriend(item,index, 3)">拒绝</el-button>
+                    </div>
+                    <div v-else-if="item.agreed == 2">
+                      <el-button size="mini" type="success" plain disabled>已同意</el-button>
+                    </div>
+                    <div v-if="item.agreed == 3">
+                      <el-button size="mini" type="danger" plain disabled>已拒绝</el-button>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'agreeFriend'">
+                  <span class="noticeContent" v-if="item.agreed == 2"> {{item.fromUser.user_name}} 同意了您的好友请求</span>
+                  <span class="noticeContent" v-if="item.agreed == 3"> {{item.fromUser.user_name}} 拒绝了您的好友请求</span>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'addPartner' && item.content">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
+                  <div class="fileTitle" @click="handleInfo(item, index)">{{item.content.file_title}}</div>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'addPartner' && !item.content">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
+                  <div class="fileTitle" style="color:red;font-size:16px;">该文件已删除</div>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+              </li>
+            </ul>
+            <div v-else class="noData">
+              <p>没有未读通知</p>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="已读消息" name="readed">
+            <ul v-if="readed.length>0" class="hasData">
+              <li v-for="(item,index) in readed" :key="index">
+                <template v-if="item.type == 'addFriend'">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 请求加您为好友</span>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                    <div v-if="item.agreed == 1">
+                      <el-button size="mini" type="success" plain @click="agreeFriend(item,index, 2)">同意</el-button>
+                      <el-button size="mini" type="danger" plain @click="agreeFriend(item,index, 3)">拒绝</el-button>
+                    </div>
+                    <div v-else-if="item.agreed == 2">
+                      <el-button size="mini" type="success" plain disabled>已同意</el-button>
+                    </div>
+                    <div v-if="item.agreed == 3">
+                      <el-button size="mini" type="danger" plain disabled>已拒绝</el-button>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'agreeFriend'">
+                  <span class="noticeContent" v-if="item.agreed == 2"> {{item.fromUser.user_name}} 同意了您的好友请求</span>
+                  <span class="noticeContent" v-if="item.agreed == 3"> {{item.fromUser.user_name}} 拒绝了您的好友请求</span>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'addPartner' && item.content">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
+                  <div class="fileTitle" @click="handleInfo(item, index)">{{item.content.file_title}}</div>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="item.type == 'addPartner' && !item.content">
+                  <span class="noticeContent"> {{item.fromUser.user_name}} 邀请您一起编辑文件</span>
+                  <div class="fileTitle" style="color:red;font-size:16px;">该文件已删除</div>
+                  <div class="listInfo">
+                    <div class="time">
+                      {{item.createTime | moment("YYYY-MM-DD HH:mm:ss")}}
+                    </div>
+                  </div>
+                </template>
+              </li>
+            </ul>
+            <div v-else class="noData">
+              <p>没有已读通知</p>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+        <el-badge :value="unread.length" class="item" slot="reference">
           <i class="icon el-icon-bell"></i>
         </el-badge>
         <!-- <i slot="reference" class="icon el-icon-bell"></i> -->
       </el-popover>
 
       <el-dropdown trigger="click" @command="handleCommand">
-        <span class="el-dropdown-link"  style="line-height: 48px;">
+        <span class="el-dropdown-link" style="line-height: 48px;">
           <div class="user-logo">{{user_name.charAt(0)}}</div>
           {{user_name}}
           <i class="el-icon-caret-bottom"></i>
@@ -167,11 +225,30 @@ export default {
       pwdRules: {
         oldpwd: [{ validator: validatePwd, trigger: ["blur", "change"] }],
         newpwd: [{ validator: validatePwd, trigger: ["blur", "change"] }]
-      }
+      },
+      activeName: "unread"
     };
   },
   computed: {
     ...mapState(["notice"]),
+    readed() {
+      var arr = [];
+      for (var i in this.notice) {
+        if (this.notice[i].readed) {
+          arr.push(this.notice[i]);
+        }
+      }
+      return arr;
+    },
+    unread() {
+      var arr = [];
+      for (var i in this.notice) {
+        if (!this.notice[i].readed) {
+          arr.push(this.notice[i]);
+        }
+      }
+      return arr;
+    },
     total() {
       return this.notice.length;
     }
@@ -181,15 +258,15 @@ export default {
   },
   mounted() {
     this.$socket.on("newReplayNotice", res => {
-      res.self = this
+      res.self = this;
       this.$store.dispatch("newReplayNotice", res);
     });
     this.$socket.on("newNotice", res => {
-      res.self = this
+      res.self = this;
       this.$store.dispatch("newNotice", res);
     });
     this.$socket.on("newPartner", res => {
-      res.self = this
+      res.self = this;
       this.$store.dispatch("newNotice", res);
     });
   },
@@ -270,36 +347,58 @@ export default {
         }
       });
     },
-    handleInfo(content) {
-      let { href } = this.$router.resolve({
-        name: "file",
-        query: {
-          id: content._id
-        }
-      });
-      window.open(href, "_blank");
+    handleInfo(item, index) {
+      var self = this;
+      if (item.readed) {
+        // this.$router.push({
+        //   path: "/file",
+        //   query: {
+        //     id: item.content._id
+        //   }
+        // });
+        let { href } = this.$router.resolve({
+          name: "file",
+          query: {
+            id: item.content._id
+          }
+        });
+        window.open(href, "_blank");
+      } else {
+        this.$store.dispatch("reciveNotice", {
+          index: index,
+          item: item,
+          _id: item._id,
+          self: self
+        });
+      }
+      // let { href } = this.$router.resolve({
+      //   name: "file",
+      //   query: {
+      //     id: content._id
+      //   }
+      // });
+      // window.open(href, "_blank");
     },
     agreeFriend(item, index, agreed) {
-      var self = this
-      this.$store
-        .dispatch("updateNotice", {
-          item: item,
-          index: index,
-          from_id: item.fromUser._id,
-          type: item.type,
-          _id: item._id,
-          agreed: agreed,
-          self: self
-        })
-
+      var self = this;
+      this.$store.dispatch("updateNotice", {
+        item: item,
+        index: index,
+        from_id: item.fromUser._id,
+        type: item.type,
+        _id: item._id,
+        agreed: agreed,
+        self: self
+      });
     },
     handleClick(type, event) {
       // console.log(type, event)
     },
-    getNotice() {
+    getNotice(flag) {
       var self = this;
       this.$store.dispatch("noticeList", {
-        self: self
+        self: self,
+        flag: flag
       });
     },
     handleCommand(command) {
@@ -373,6 +472,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .user-info {
   display: flex;
   flex-direction: row;

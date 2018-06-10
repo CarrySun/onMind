@@ -45,5 +45,6 @@ module.exports = function () {
   //notice
   router.post("/notice/list", App.hasBody, App.hasToken, Notice.list);
   router.post("/notice/update", App.hasBody, App.hasToken, Notice.update);
+  router.post("/notice/recive", App.hasBody, App.hasToken, Notice.recive);
   return router;
 };

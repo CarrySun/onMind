@@ -66,35 +66,35 @@ exports.add = async (ctx, next) => {
     }).exec();
   }
   if (toUser) {
+    console.log(toUser)
     if (fromUser._id == toUser._id.toString()) {
       ctx.body = { success: false, err: "不可以添加自己为好友哦" };
       return next;
     } else {
-      var flag = false;
-      var friend = await Friend.find(
-        // {},
-        { ask_id: toUser._id },
-        { answer_id: toUser._id }
-      );
-      console.log("friend");
-      console.log(friend);
-      // var answerFriend = await Friend.find({
-      //   ask_id: toUser._id
-      // })
-      // var askFriend = await Friend.find({
-      //   answer_id: toUser._id
-      // })
-      // if ((answerFriend && answerFriend.answer_id == fromUser._id) || (askFriend && askFriend.ask_id == fromUser._id)) {
-      //   ctx.body = { success: false, err: "他／她已经是你的好友了哦" };
-      // }
+      // var flag = false;
+      // var friend = await Friend.find(
+      //   // {},
+      //   { ask_id: toUser._id },
+      //   { answer_id: toUser._id }
+      // );
+      // console.log("friend");
+      // console.log(friend);
+      var answerFriend = await Friend.findOne({
+        ask_id: toUser._id
+      })
+      var askFriend = await Friend.findOne({
+        answer_id: toUser._id
+      })
 
-      // console.log('answerFriend')
-      // console.log(answerFriend)
-      // console.log('askFriend')
-      // console.log(askFriend)
-      if (friend.length > 0) {
+      console.log('answerFriend')
+      console.log(answerFriend)
+      console.log('askFriend')
+      console.log(askFriend)
+      console.log(fromUser._id)
+      if ((answerFriend && answerFriend.answer_id.toString() == fromUser._id) || (askFriend && askFriend.ask_id.toString() == fromUser._id)) {
         ctx.body = { success: false, err: "他／她已经是你的好友了哦" };
-      } else {
+      }
+      else {
         var notice = await Notice.find({
           toUser: toUser._id,
           fromUser: fromUser._id,

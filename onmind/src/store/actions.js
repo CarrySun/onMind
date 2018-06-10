@@ -188,14 +188,12 @@ export default {
   },
   async addFile({ dispatch, commit }, formdata) {
     if (formdata.file_title && formdata.file_type) {
-      return await apis
-        .addFileApi({
-          file_title: formdata.file_title,
-          file_type: formdata.file_type,
-          file_partner: formdata.file_partner,
-          accessToken: localStorage.getItem("accessToken")
-        })
-
+      return await apis.addFileApi({
+        file_title: formdata.file_title,
+        file_type: formdata.file_type,
+        file_partner: formdata.file_partner,
+        accessToken: localStorage.getItem("accessToken")
+      });
     }
   },
 
@@ -311,12 +309,11 @@ export default {
 
   async updateFilePartner({ dispatch, commit }, formdata) {
     if (formdata._id && formdata.file_partner) {
-      return await apis
-        .updateFileApi({
-          _id: formdata._id,
-          file_partner: formdata.file_partner,
-          accessToken: localStorage.getItem("accessToken")
-        })
+      return await apis.updateFileApi({
+        _id: formdata._id,
+        file_partner: formdata.file_partner,
+        accessToken: localStorage.getItem("accessToken")
+      });
     }
   },
   async updateFileTitle({ dispatch, commit }, formdata) {
@@ -501,38 +498,37 @@ export default {
       });
   },
   async addPartner({ dispatch, commit }, formdata) {
-    return await apis
-      .addPartnerApi({
-        _id: formdata._id,
-        checked: formdata.checked,
-        uncheck: formdata.uncheck,
-        file_partner: formdata.file_partner,
-        accessToken: localStorage.getItem("accessToken")
-      })
-
+    return await apis.addPartnerApi({
+      _id: formdata._id,
+      checked: formdata.checked,
+      uncheck: formdata.uncheck,
+      file_partner: formdata.file_partner,
+      accessToken: localStorage.getItem("accessToken")
+    });
   },
   //notice
   async newReplayNotice({ dispatch, commit }, formdata) {
     commit(types.ADD_NOTICE, formdata.notice);
     commit(types.ADD_FRIEND, formdata.friend);
-    var self = formdata.self
+    var self = formdata.self;
     self.$message({
-      type: 'warning',
-      message: '您有一条新通知，记得查看哦'
-    })
+      type: "warning",
+      message: "您有一条新通知，记得查看哦"
+    });
   },
   async newNotice({ dispatch, commit }, formdata) {
     commit(types.ADD_NOTICE, formdata.notice);
-    var self = formdata.self
+    var self = formdata.self;
     self.$message({
-      type: 'warning',
-      message: '您有一条新通知，记得查看哦'
-    })
+      type: "warning",
+      message: "您有一条新通知，记得查看哦"
+    });
   },
   async noticeList({ dispatch, commit }, formdata) {
     var self = formdata.self;
     await apis
       .noticeListApi({
+        flag: formdata.flag,
         accessToken: localStorage.getItem("accessToken")
       })
       .then(res => {
@@ -571,11 +567,12 @@ export default {
         self.$socket.emit("newReplayNotice", {
           to: res.data.data.to,
           notice: res.data.data.notice,
-          friend: res.data.data.friend,
+          friend: res.data.data.friend
         });
         commit(types.ADD_FRIEND, res.data.data.friend);
         var item = common.cloneObj(formdata.item);
         item.agreed = formdata.agreed;
+        item.readed = true;
         var res = {
           index: formdata.index,
           notice: item
@@ -583,5 +580,48 @@ export default {
         commit(types.UPDATE_NOTICE, res);
       }
     });
+  },
+
+  async reciveNotice({ dispatch, commit }, formdata) {
+    var self = formdata.self;
+    await apis
+      .reciveNoticeApi({
+        _id: formdata._id,
+        accessToken: localStorage.getItem("accessToken")
+      })
+      .then(res => {
+        if (res.data.success) {
+          var item = common.cloneObj(formdata.item);
+          item.readed = true;
+          var res = {
+            index: formdata.index,
+            notice: item
+          };
+          commit(types.UPDATE_NOTICE, res);
+          // self.$router.push({
+          //   path: "/file",
+          //   query: {
+          //     id: item.content._id
+          //   }
+          // });
+          let { href } = self.$router.resolve({
+            name: "file",
+            query: {
+              id: item.content._id
+            }
+          });
+        } else {
+          self.$message({
+            type: "error",
+            message: res.data.err
+          });
+        }
+      })
+      .catch(err => {
+        self.$message({
+          type: "error",
+          message: err
+        });
+      });
   }
 };

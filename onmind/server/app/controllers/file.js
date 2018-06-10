@@ -280,6 +280,7 @@ exports.addEditingUser = async (ctx, next) => {
       _id: file_id
     })
       .populate("editingUser", userFields.join(" "))
+      .populate("lookingUser", userFields.join(" "))
       .exec();
     ctx.body = { success: true, data: file };
   } else {
@@ -296,15 +297,19 @@ exports.removeEditingUser = async (ctx, next) => {
   if (file) {
     file.isEdit = false;
     file.editingUser = null;
-    // if (!file.editingUser) {
-    //   file.editingUser = [];
-    // }
-    // for (var i = 0; i < file.editingUser.length; i++) {
-    //   if (file.editingUser[i].toString() == user._id) {
-    //     file.editingUser.splice(i, 1);
-    //     break;
-    //   }
-    // }
+    if (body.flag) {
+      if (!file.lookingUser) {
+        file.lookingUser = [];
+      }
+      for (var i = 0; i < file.lookingUser.length; i++) {
+        if (file.lookingUser[i].toString() == user._id) {
+          file.lookingUser.splice(i, 1);
+          break;
+        }
+      }
+      console.log(file.lookingUser)
+    }
+
     try {
       file = await file.save();
     } catch (e) {
@@ -319,6 +324,7 @@ exports.removeEditingUser = async (ctx, next) => {
       _id: file_id
     })
       .populate("editingUser", userFields.join(" "))
+      .populate("lookingUser", userFields.join(" "))
       .exec();
     ctx.body = { success: true, data: file };
   } else {
@@ -330,12 +336,46 @@ exports.getData = async (ctx, next) => {
   var user = ctx.session.user;
   var file = await File.findOne({ _id: body._id })
     .populate("editingUser", userFields.join(" "))
+    .populate("lookingUser", userFields.join(" "))
     .exec();
   if (file) {
-    ctx.body = {
-      success: true,
-      data: file
-    };
+    if (body.flag) {
+      if (!file.lookingUser) {
+        file.lookingUser = [];
+      }
+      var flag = false;
+      for (var i = 0; i < file.lookingUser.length; i++) {
+        if (file.lookingUser[i]._id.toString() == user._id) {
+          flag = true;
+          break;
+        }
+      }
+      if (!flag) {
+        file.lookingUser.push(user._id);
+        try {
+          file = await file.save();
+        } catch (e) {
+          console.log(e);
+          ctx.body = {
+            success: false,
+            err: e
+          };
+          return next;
+        }
+        file = await File.findOne({ _id: body._id })
+          .populate("editingUser", userFields.join(" "))
+          .populate("lookingUser", userFields.join(" "));
+      }
+      ctx.body = {
+        success: true,
+        data: file
+      };
+    } else {
+      ctx.body = {
+        success: true,
+        data: file
+      };
+    }
   } else {
     ctx.body = {
       success: false,

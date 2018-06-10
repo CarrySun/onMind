@@ -366,6 +366,7 @@ export default {
     if (formdata._id) {
       return await apis.getFileDataApi({
         _id: formdata._id,
+        flag: formdata.flag,
         accessToken: localStorage.getItem("accessToken")
       });
     }
@@ -389,6 +390,7 @@ export default {
   async removeEditingUser({ dispatch, commit }, formdata) {
     var data = {
       file_id: formdata.file_id,
+      flag: formdata.flag,
       accessToken: localStorage.getItem("accessToken")
     };
 

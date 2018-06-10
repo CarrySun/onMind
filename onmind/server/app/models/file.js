@@ -8,12 +8,12 @@ var FileSchema = new Schema({
   file_type: String,
   file_details: [String],
   isEdit: false,
-  // editingUser: [
-  //   {
-  //     type: ObjectId,
-  //     ref: "User"
-  //   }
-  // ],
+  lookingUser: [
+    {
+      type: ObjectId,
+      ref: "User"
+    }
+  ],
   editingUser: {
     type: ObjectId,
     ref: "User"

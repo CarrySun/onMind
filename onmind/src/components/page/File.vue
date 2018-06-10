@@ -9,7 +9,7 @@
     <el-container>
       <el-header>
         <div class="left">
-          <a class="logo" href="/">
+          <a class="logo" @click="goOwner">
             <i class="el-icon-arrow-left">onMind</i>
           </a>
           &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -57,6 +57,10 @@
           </VueContextMenu>
         </div>
       </el-main>
+      <div class="footer">
+      <div v-if="fileData.lookingUser && fileData.lookingUser.length>0">当前在线:
+        <el-tag size="mini" v-for="(item,index) in fileData.lookingUser" :key="index">{{item.user_name}}</el-tag>
+      </div></div>
     </el-container>
   </div>
 </template>
@@ -190,6 +194,11 @@ export default {
     }
   },
   methods: {
+    goOwner() {
+      this.$router.push({
+        path: "/owner"
+      });
+    },
     toggle_editable(event) {
       var btn = event.target;
       var editable = jm.get_editable();
@@ -208,7 +217,7 @@ export default {
           var value = self.reForm.file_title;
           if (value && value === self.file_title) {
           } else if (value) {
-            console.log(value);
+            // console.log(value);
             self.saveState = "正在进行文件重命名";
             self.$store.dispatch("updateFileTitle", {
               self: self,
@@ -228,14 +237,15 @@ export default {
       //   this.focus();
       // }
     },
-    loadData() {
+    loadData(flag) {
       var self = this;
       var id = common.getUrlParam(
         decodeURI(document.location.toString()),
         "id"
       );
       return this.$store.dispatch("getFileData", {
-        _id: id
+        _id: id,
+        flag: flag
       });
     },
     handleCommand(command) {
@@ -471,11 +481,12 @@ export default {
           callback(new Error("网络错误" + err));
         });
     },
-    removeEditingUser() {
+    removeEditingUser(flag) {
       var self = this;
       this.$store
         .dispatch("removeEditingUser", {
-          file_id: self.id
+          file_id: self.id,
+          flag: flag
         })
         .then(res => {
           if (res.data.success) {
@@ -498,6 +509,21 @@ export default {
             self.$socket.emit("removeEditingUser", {
               tos: tos
             });
+            if (flag) {
+              var lookTos = [];
+              var lookingUser = self.fileData.lookingUser
+                ? self.fileData.lookingUser
+                : [];
+              for (var i in lookingUser) {
+                if (lookingUser[i]._id != _id) {
+                  lookTos.push(lookingUser[i]._id);
+                }
+              }
+              self.$socket.emit("removeLookingUser", {
+                lookTos: lookTos,
+                lookingUser: self.fileData.lookingUser
+              });
+            }
           } else {
             self.$message({
               type: "error",
@@ -567,12 +593,17 @@ export default {
       }
     },
     beforeunloadHandler(e) {
-      this.removeEditingUser();
+      // this.removeEditingUser(true);
+      var self = this
+      this.$socket.emit("quit",{
+        file_id: self.id,
+        _id: JSON.parse(localStorage.getItem('user'))._id
+      });
     }
   },
   created: function() {
     var self = this;
-    this.loadData()
+    this.loadData(true)
       .then(function(res) {
         self.loading = false;
         if (res && res.data) {
@@ -584,6 +615,17 @@ export default {
             });
           } else if (data.success) {
             self.fileData = data.data;
+            var tos = [];
+            var _id = JSON.parse(localStorage.getItem("user"))._id;
+            for (var i = 0; i < self.fileData.lookingUser.length; i++) {
+              if (self.fileData.lookingUser[i]._id != _id) {
+                tos.push(self.fileData.lookingUser[i]._id);
+              }
+            }
+            self.$socket.emit("addLookingUser", {
+              tos: tos,
+              lookingUser: self.fileData.lookingUser
+            });
             self.load_jsmind();
           }
         }
@@ -597,19 +639,89 @@ export default {
         });
       });
   },
+  beforeRouteLeave(to, from, next) {
+    var flag = true;
+    var self = this;
+    this.$store
+      .dispatch("removeEditingUser", {
+        file_id: self.id,
+        flag: flag
+      })
+      .then(res => {
+        if (res.data.success) {
+          self.fileData = res.data.data;
+          var partner = res.data.data.file_partner.concat();
+          var owner = res.data.data.file_owner;
+          var tos = [];
+          var _id = JSON.parse(localStorage.getItem("user"))._id;
+          if (_id == owner) {
+            tos = partner.concat();
+          } else {
+            var index = partner.indexOf(_id);
+            tos.push(owner);
+            for (var i in partner) {
+              if (i != index) {
+                tos.push(partner[i]);
+              }
+            }
+          }
+          self.$socket.emit("removeEditingUser", {
+            tos: tos
+          });
+          if (flag) {
+            var lookTos = [];
+            var lookingUser = self.fileData.lookingUser
+              ? self.fileData.lookingUser
+              : [];
+            for (var i in lookingUser) {
+              if (lookingUser[i]._id != _id) {
+                lookTos.push(lookingUser[i]._id);
+              }
+            }
+            self.$socket.emit("removeLookingUser", {
+              lookTos: lookTos,
+              lookingUser: self.fileData.lookingUser
+            });
+          }
+          next();
+        } else {
+          self.$message({
+            type: "error",
+            message: res.data.err
+          });
+
+          next(false);
+        }
+      })
+      .catch(err => {
+        self.$message({
+          type: "error",
+          message: "出现了未知的谜团，请重试"
+        });
+        console.log(err);
+        next(false);
+      });
+  },
   mounted() {
     const self = this;
     this.addEventListeners();
     window.addEventListener("beforeunload", e => self.beforeunloadHandler(e));
-    // window.addEventListener("unload", e => self.beforeunloadHandler(e));
+    this.$socket.on("addLookingUser", res => {
+      // console.log("addLookingUser");
+      self.fileData.lookingUser = res.lookingUser;
+    });
+    this.$socket.on("removeLookingUser", res => {
+      // console.log("removeLookingUser");
+      self.fileData.lookingUser = res.lookingUser;
+    });
     this.$socket.on("addEditingUser", res => {
-      console.log("addEditingUser");
+      // console.log("addEditingUser");
       self.editable = false;
       self.fileData.editingUser = res.editingUser;
       self.fileData.isEdit = true;
     });
     this.$socket.on("removeEditingUser", res => {
-      console.log("removeEditingUser");
+      // console.log("removeEditingUser");
       self.editable = true;
       self.fileData.editingUser = null;
       self
@@ -642,6 +754,16 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+.footer {
+  width: 100%;
+  min-width: 1200px;
+  position: absolute;
+  height: 40px;
+  bottom: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
 .el-header {
   background-color: #393f4f;
   position: relative;
@@ -731,7 +853,7 @@ export default {
   top: 45px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 40px;
   padding: 0;
   #jsmind_container {
     width: 5000px;
@@ -757,5 +879,12 @@ export default {
   justify-content: center;
   align-items: center;
   font-size: 40px;
+}
+#online {
+  position: absolute;
+  top: 50px;
+  border: 1px solid red;
+  z-index: 100;
+  right: 0;
 }
 </style>

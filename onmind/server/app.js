@@ -57,8 +57,8 @@ io.on("connection", function(socket) {
     console.log("------------------------有人上线哦------------------------");
     console.log("新来的：");
     console.log(_id);
+    socket._id = _id;
     if (!(_id in usocket)) {
-      socket._id = _id;
       usocket[_id] = socket;
       user.push(_id);
       console.log("在线的人:");
@@ -90,7 +90,7 @@ io.on("connection", function(socket) {
   });
 
   socket.on("newNotice", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("newNotice");
 
     if (res.to in usocket) {
@@ -101,7 +101,7 @@ io.on("connection", function(socket) {
     }
   });
   socket.on("newReplayNotice", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("newReplayNotice");
     if (res.to in usocket) {
       console.log("在线");
@@ -111,7 +111,7 @@ io.on("connection", function(socket) {
     }
   });
   socket.on("newPartner", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("newPartner");
     for (var i in res.tos) {
       if (res.tos[i] in usocket) {
@@ -123,7 +123,7 @@ io.on("connection", function(socket) {
     }
   });
   socket.on("addEditingUser", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("addEditingUser");
     for (var i in res.tos) {
       if (res.tos[i] in usocket) {
@@ -135,7 +135,7 @@ io.on("connection", function(socket) {
     }
   });
   socket.on("removeEditingUser", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("removeEditingUser");
     for (var i in res.tos) {
       if (res.tos[i] in usocket) {
@@ -146,4 +146,68 @@ io.on("connection", function(socket) {
       }
     }
   });
+  socket.on("addLookingUser", function(res) {
+    // console.log(res);
+    console.log("addLookingUser");
+    for (var i in res.tos) {
+      if (res.tos[i] in usocket) {
+        console.log(res.tos[i] + "在线");
+        usocket[res.tos[i]].emit("addLookingUser", res);
+      } else {
+        console.log(res.tos[i] + "不在线 收不到消息");
+      }
+    }
+  });
+  socket.on("removeLookingUser", function(res) {
+    // console.log(res);
+    console.log("removeLookingUser");
+    for (var i in res.tos) {
+      if (res.tos[i] in usocket) {
+        console.log(res.tos[i] + "在线");
+        usocket[res.tos[i]].emit("removeLookingUser", res);
+      } else {
+        console.log(res.tos[i] + "不在线 收不到消息");
+      }
+    }
+  });
+  socket.on("quit", function(res) {
+    console.log(res);
+    console.log("quit");
+    quit(res.file_id, res._id);
+  });
 });
+var mongoose = require("mongoose");
+var File = mongoose.model("File");
+function quit(file_id, _id) {
+  File.findOne({
+    _id: file_id
+  }).then(file => {
+    if (file) {
+      file.isEdit = false;
+      file.editingUser = null;
+      if (!file.lookingUser) {
+        file.lookingUser = [];
+      }
+      for (var i = 0; i < file.lookingUser.length; i++) {
+        if (file.lookingUser[i].toString() == _id) {
+          file.lookingUser.splice(i, 1);
+          break;
+        }
+      }
+        for (var i = 0; i < file.lookingUser.length; i++) {
+        if (file.lookingUser[i] in usocket) {
+          console.log(file.lookingUser[i] + "在线");
+          var res = {
+            lookingUser: file.lookingUser
+          };
+          console.log(res)
+          usocket[file.lookingUser[i]].emit("removeLookingUser", res);
+          usocket[file.lookingUser[i]].emit("removeEditingUser");
+        } else {
+          console.log(file.lookingUser[i] + "不在线 收不到消息");
+        }
+      }
+      file.save();
+    }
+  });
+}

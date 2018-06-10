@@ -12,6 +12,7 @@ import "element-ui/lib/theme-chalk/index.css";
 import "./assets/icon/iconfont.css";
 
 Vue.use(ElementUI);
+
 router.beforeEach((to, from, next) => {
   // console.log(localStorage.getItem('accessToken'))
   if (to.meta.auth) {

@@ -1,9 +1,11 @@
 import Vue from "vue";
 import VueSocketio from "vue-socket.io";
 import socketio from "socket.io-client";
-
-Vue.use(VueSocketio, socketio("http://localhost:3000/"), Store)
-
+if (process.env.NODE_ENV === "development") {
+  Vue.use(VueSocketio, socketio("http://localhost:3000/"), Store)
+} else {
+  Vue.use(VueSocketio, socketio("http://123.207.1.238:3000/"), Store)
+}
 import App from "./App";
 import router from "./router";
 import Store from "./store/index.js";

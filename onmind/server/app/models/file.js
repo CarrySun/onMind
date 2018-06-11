@@ -7,7 +7,10 @@ var FileSchema = new Schema({
   file_title: String,
   file_type: String,
   file_details: [String],
-  isEdit: false,
+  isEdit: {
+    type: Boolean,
+    default: false,
+  },
   lookingUser: [
     {
       type: ObjectId,

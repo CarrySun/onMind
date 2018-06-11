@@ -325,6 +325,12 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     }
+  },
+  mounted() {
+    // var accessToken = localStorage.getItem("accessToken");
+    // if (accessToken) {
+    //   this.$socket.emit("log", JSON.parse(localStorage.getItem("user"))._id);
+    // }
   }
 };
 </script>

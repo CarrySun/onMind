@@ -143,7 +143,10 @@
             </div>
           </el-tab-pane>
         </el-tabs>
-        <el-badge :value="unread.length" class="item" slot="reference">
+        <el-badge v-if="unread.length > 0" :value="unread.length" class="item" slot="reference">
+          <i class="icon el-icon-bell"></i>
+        </el-badge>
+        <el-badge v-else class="item" slot="reference">
           <i class="icon el-icon-bell"></i>
         </el-badge>
         <!-- <i slot="reference" class="icon el-icon-bell"></i> -->
@@ -350,19 +353,19 @@ export default {
     handleInfo(item, index) {
       var self = this;
       if (item.readed) {
-        // this.$router.push({
-        //   path: "/file",
-        //   query: {
-        //     id: item.content._id
-        //   }
-        // });
-        let { href } = this.$router.resolve({
-          name: "file",
+        this.$router.push({
+          path: "/file",
           query: {
             id: item.content._id
           }
         });
-        window.open(href, "_blank");
+        // let { href } = this.$router.resolve({
+        //   name: "file",
+        //   query: {
+        //     id: item.content._id
+        //   }
+        // });
+        // window.open(href, "_blank");
       } else {
         this.$store.dispatch("reciveNotice", {
           index: index,

@@ -317,19 +317,19 @@ export default {
         });
     },
     handleInfo(index, row) {
-      // this.$router.push({
-      //   path: "/file",
-      //   query: {
-      //     id: row._id
-      //   }
-      // });
-      let { href } = this.$router.resolve({
-        name: "file",
+      this.$router.push({
+        path: "/file",
         query: {
           id: row._id
         }
       });
-      window.open(href, "_blank");
+      // let { href } = this.$router.resolve({
+      //   name: "file",
+      //   query: {
+      //     id: row._id
+      //   }
+      // });
+      // window.open(href, "_blank");
     },
     handleRename(index, row) {
       var self = this;
@@ -396,6 +396,12 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     }
+  },
+  mounted() {
+    // var accessToken = localStorage.getItem("accessToken");
+    // if (accessToken) {
+    //   this.$socket.emit("log", JSON.parse(localStorage.getItem("user"))._id);
+    // }
   }
 };
 </script>

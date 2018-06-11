@@ -33,12 +33,10 @@ exports.list = async (ctx, next) => {
     .populate("fromUser", userFields.join(" "))
     .populate("content", fileFields.join(" "))
     .exec();
-  console.log(notice.constructor);
   var oldNotice = cloneObj(notice)
   ctx.body = { success: true, data: oldNotice, newNotice: newNotice, total: oldNotice.length };
   if (body.flag) {
     var newNotice = notice.concat()
-    console.log(newNotice)
     for (var i = 0; i < newNotice.length; i++) {
       if (!newNotice[i].readed && newNotice[i].type == "agreeFriend") {
         newNotice[i].readed = true;

@@ -594,10 +594,10 @@ export default {
     },
     beforeunloadHandler(e) {
       // this.removeEditingUser(true);
-      var self = this
-      this.$socket.emit("quit",{
+      var self = this;
+      this.$socket.emit("quit", {
         file_id: self.id,
-        _id: JSON.parse(localStorage.getItem('user'))._id
+        _id: JSON.parse(localStorage.getItem("user"))._id
       });
     }
   },
@@ -703,6 +703,10 @@ export default {
       });
   },
   mounted() {
+    // var accessToken = localStorage.getItem("accessToken");
+    // if (accessToken) {
+    //   this.$socket.emit("log", JSON.parse(localStorage.getItem("user"))._id);
+    // }
     const self = this;
     this.addEventListeners();
     window.addEventListener("beforeunload", e => self.beforeunloadHandler(e));

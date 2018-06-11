@@ -73,6 +73,10 @@ export default {
     }
   },
   mounted() {
+    // var accessToken = localStorage.getItem("accessToken");
+    // if (accessToken) {
+    //   this.$socket.emit("log", JSON.parse(localStorage.getItem("user"))._id);
+    // }
     // this.$socket.on("newPartner", res => {
     //   this.$message({
     //     type: "warning",
@@ -113,13 +117,19 @@ export default {
         });
     },
     handleInfo(index, row) {
-      let { href } = this.$router.resolve({
-        name: "file",
+      this.$router.push({
+        path: "/file",
         query: {
           id: row._id
         }
       });
-      window.open(href, "_blank");
+      // let { href } = this.$router.resolve({
+      //   name: "file",
+      //   query: {
+      //     id: row._id
+      //   }
+      // });
+      // window.open(href, "_blank");
     },
     handleQuit(index, row) {
       const self = this;

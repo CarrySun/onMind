@@ -61,9 +61,9 @@ io.on("connection", function(socket) {
     if (!(_id in usocket)) {
       usocket[_id] = socket;
       user.push(_id);
-      console.log("在线的人:");
-      console.log(user);
     }
+    console.log("在线的人:");
+    console.log(user);
     socket.emit("login", "hello" + _id);
   });
   socket.on("logout", function(_id) {
@@ -171,7 +171,7 @@ io.on("connection", function(socket) {
     }
   });
   socket.on("quit", function(res) {
-    console.log(res);
+    // console.log(res);
     console.log("quit");
     quit(res.file_id, res._id);
   });
@@ -194,13 +194,13 @@ function quit(file_id, _id) {
           break;
         }
       }
-        for (var i = 0; i < file.lookingUser.length; i++) {
+      for (var i = 0; i < file.lookingUser.length; i++) {
         if (file.lookingUser[i] in usocket) {
           console.log(file.lookingUser[i] + "在线");
           var res = {
             lookingUser: file.lookingUser
           };
-          console.log(res)
+          console.log(res);
           usocket[file.lookingUser[i]].emit("removeLookingUser", res);
           usocket[file.lookingUser[i]].emit("removeEditingUser");
         } else {

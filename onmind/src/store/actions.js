@@ -598,18 +598,19 @@ export default {
             notice: item
           };
           commit(types.UPDATE_NOTICE, res);
-          // self.$router.push({
-          //   path: "/file",
-          //   query: {
-          //     id: item.content._id
-          //   }
-          // });
-          let { href } = self.$router.resolve({
-            name: "file",
+          self.$router.push({
+            path: "/file",
             query: {
               id: item.content._id
             }
           });
+          // let { href } = self.$router.resolve({
+          //   name: "file",
+          //   query: {
+          //     id: item.content._id
+          //   }
+          // });
+          // window.open(href, "_blank");
         } else {
           self.$message({
             type: "error",

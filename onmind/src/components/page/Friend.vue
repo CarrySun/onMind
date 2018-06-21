@@ -25,13 +25,13 @@
                 <el-button @click="searchFriend" slot="append" icon="el-icon-search" style="width:200px">搜索</el-button>
               </el-input>
               <p class="title">搜索结果</p>
-              <el-card class="box-card" v-if='searchData'>
-                <div class="card-info">
+              <el-card class="box-card" v-if='searchData && searchData.length > 0'>
+                <div class="card-info" v-for="(item, index) in searchData" :key="index">
                   <div>
-                    <span>{{searchData.user_name}}</span>&nbsp;&nbsp;&nbsp;
-                    <span>{{searchData.user_email}}</span>
+                    <span>{{item.user_name}}</span>&nbsp;&nbsp;&nbsp;
+                    <span>{{item.user_email}}</span>
                   </div>
-                  <el-button @click="addFriend" icon="el-icon-plus" style="float: right; padding: 3px 0" type="text">加为好友</el-button>
+                  <el-button @click="addFriend(item)" icon="el-icon-plus" style="float: right; padding: 3px 0" type="text">加为好友</el-button>
                 </div>
               </el-card>
             </div>
@@ -218,13 +218,14 @@ export default {
         });
       }
     },
-    addFriend() {
+    addFriend(item) {
+      console.log(item)
       var self = this;
       this.sending = true;
       this.$store
         .dispatch("addFriend", {
           type: self.type,
-          friend: self.friendName
+          friend: item.user_name
         })
         .then(function(res) {
           self.sending = false;

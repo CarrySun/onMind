@@ -98,7 +98,11 @@ exports.list = async (ctx, next) => {
   var user = ctx.session.user;
   var data = [];
   if (listType == "file_owner") {
-    data = await File.find({ file_owner: user._id })
+    console.log(body.file_title);
+    data = await File.find({
+      file_owner: user._id,
+      file_title: { $regex: body.file_title, $options: "i" }
+    })
       .sort({
         createTime: -1
       })
@@ -192,6 +196,8 @@ exports.update = async (ctx, next) => {
       file.file_title = body.file_title;
     } else if (body.file_details) {
       file.file_details = body.file_details;
+      file.file_theme = body.file_theme;
+      file.file_direction = body.file_direction;
     } else if (body.file_partner) {
       var file_partner = [];
       if (body.file_partner.length > 0) {
@@ -307,7 +313,7 @@ exports.removeEditingUser = async (ctx, next) => {
           break;
         }
       }
-      console.log(file.lookingUser)
+      console.log(file.lookingUser);
     }
 
     try {

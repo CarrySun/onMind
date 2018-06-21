@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -26,6 +26,7 @@
         return (visibility !== 'hidden' && display !== 'none');
     };
     var jcanvas = jsMind.util.canvas;
+    //画线
     jcanvas.rect = function (ctx,x,y,w,h,r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
@@ -123,7 +124,7 @@
 
         shoot:function(callback){
             this.init();
-            this._watermark();
+            // this._watermark();
             var jms = this;
             this._draw(function(){
                 if(!!callback){
@@ -165,17 +166,17 @@
             this._draw_nodes(callback);
         },
 
-        _watermark:function(){
-            var c = this.canvas_elem;
-            var ctx = this.canvas_ctx;
-            ctx.textAlign='right';
-            ctx.textBaseline='bottom';
-            ctx.fillStyle='#000';
-            ctx.font='11px Verdana,Arial,Helvetica,sans-serif';
-            ctx.fillText('CarrySun_OnMind',c.width-5.5,c.height-2.5);
-            ctx.textAlign='left';
-            ctx.fillText($w.location,5.5,c.height-2.5);
-        },
+        // _watermark:function(){
+        //     var c = this.canvas_elem;
+        //     var ctx = this.canvas_ctx;
+        //     ctx.textAlign='right';
+        //     ctx.textBaseline='bottom';
+        //     ctx.fillStyle='#000';
+        //     ctx.font='11px Verdana,Arial,Helvetica,sans-serif';
+        //     ctx.fillText('CarrySun_OnMind',c.width-5.5,c.height-2.5);
+        //     ctx.textAlign='left';
+        //     ctx.fillText($w.location,5.5,c.height-2.5);
+        // },
 
         _draw_lines:function(){
             this.jm.view.show_lines(this.canvas_ctx);

@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -30,7 +30,7 @@ jmexpander{position:absolute;width:11px;height:11px;display:block;overflow:hidde
 jmnode{padding:10px;background-color:#fff;color:#333;border-radius:5px;box-shadow:1px 1px 1px #666;font:16px/1.125 Verdana,Arial,Helvetica,sans-serif;}
 jmnode:hover{box-shadow:2px 2px 8px #000;background-color:#ebebeb;color:#333;}
 jmnode.selected{background-color:#11f;color:#fff;box-shadow:2px 2px 8px #000;}
-jmnode.root{font-size:24px;}
+jmnode.root{font-size:24px;background:#FCF5DE!important;color: #000!important;}
 jmexpander{border-color:gray;}
 jmexpander:hover{border-color:#000;}
 

@@ -194,7 +194,7 @@ export default {
           this.$store
             .dispatch("log", {
               user_email: this.form.user_email,
-              user_password: this.form.user_password,
+              user_password: this.form.user_password
             })
             .then(function(res) {
               self.loging = false;
@@ -394,5 +394,11 @@ export default {
   font-size: 14px;
   cursor: pointer;
   z-index: 100;
+}
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
 }
 </style>

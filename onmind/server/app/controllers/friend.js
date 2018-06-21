@@ -44,8 +44,11 @@ exports.search = async (ctx, next) => {
     });
     ctx.body = { success: true, data: user };
   } else if (body.type == "name") {
-    user = await User.findOne({
-      user_name: body.friend
+    // user = await User.findOne({
+    //   user_name: body.friend
+    // });
+    user = await User.find({
+      user_name: { $regex: body.friend, $options: "i" }
     });
     ctx.body = { success: true, data: user };
   }

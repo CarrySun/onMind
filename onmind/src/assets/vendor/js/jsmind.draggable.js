@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -208,18 +208,18 @@
                 var evt = e || event;
                 jd.dragend.call(jd,evt);
             });
-            jdom.add_event(container,'touchstart',function(e){
-                var evt = e || event;
-                jd.dragstart.call(jd,evt);
-            });
-            jdom.add_event(container,'touchmove',function(e){
-                var evt = e || event;
-                jd.drag.call(jd,evt);
-            });
-            jdom.add_event(container,'touchend',function(e){
-                var evt = e || event;
-                jd.dragend.call(jd,evt);
-            });
+            // jdom.add_event(container,'touchstart',function(e){
+            //     var evt = e || event;
+            //     jd.dragstart.call(jd,evt);
+            // });
+            // jdom.add_event(container,'touchmove',function(e){
+            //     var evt = e || event;
+            //     jd.drag.call(jd,evt);
+            // });
+            // jdom.add_event(container,'touchend',function(e){
+            //     var evt = e || event;
+            //     jd.dragend.call(jd,evt);
+            // });
         },
 
         dragstart:function(e){

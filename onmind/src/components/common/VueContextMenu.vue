@@ -46,6 +46,14 @@ export default {
       menu.style.display = "block";
       menu.style.left = x + "px";
       menu.style.top = y + "px";
+      var height = document.body.clientHeight
+      var width = document.body.clientWidth
+      if(height -y < 200) {
+        menu.style.top = height - 200 +"px";
+      }
+      if(width -x < 250) {
+        menu.style.left = width - 400 +"px";
+      }
       document.addEventListener(
         "mouseup",
         function() {

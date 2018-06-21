@@ -6,10 +6,19 @@ const ObjectId = Schema.Types.ObjectId;
 var FileSchema = new Schema({
   file_title: String,
   file_type: String,
+  file_direction: String,
+  // {
+  //   type: String,
+  //   default: "center"
+  // },
+  file_theme: {
+    type: String,
+    default: "primary"
+  },
   file_details: [String],
   isEdit: {
     type: Boolean,
-    default: false,
+    default: false
   },
   lookingUser: [
     {

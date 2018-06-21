@@ -9,7 +9,9 @@
       </div>
       <div class="handle-box">
         <div style="position:relative; margin-right:20px">
-          <el-input v-model="select_word" prefix-icon="el-icon-search" placeholder="" class="handle-input mr10"></el-input>
+           <!-- @keyup.enter.native="getData" -->
+          <!-- <el-input v-model="select_word" prefix-icon="el-icon-search" placeholder="" class="handle-input mr10"></el-input> -->
+          <el-input v-model="file_title" placeholder="文件名" prefix-icon="el-icon-search" class="handle-input mr10" @keyup.enter.native="getData"></el-input>
         </div>
         <div>
           <el-button type="primary" icon="el-icon-plus" class="handle-del mr10" @click="dialogFormVisible = true">新建文件</el-button>
@@ -122,6 +124,7 @@ export default {
       }
     };
     return {
+      file_title:'',
       dialogShareVisible: false,
       activeRow: {},
       loading: true,
@@ -287,10 +290,12 @@ export default {
       });
     },
     getData() {
+      this.tableData = []
       let self = this;
       this.$store
         .dispatch("fileList", {
           listType: "file_owner",
+          file_title: self.file_title,
           self: self
         })
         .then(function(res) {

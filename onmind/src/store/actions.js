@@ -202,6 +202,7 @@ export default {
     if (formdata.listType) {
       return await apis.fileListApi({
         listType: formdata.listType,
+        file_title: formdata.file_title,
         accessToken: localStorage.getItem("accessToken")
       });
       // .then(function(res) {
@@ -372,6 +373,8 @@ export default {
     return await apis.updateFileApi({
       _id: formdata._id,
       file_details: formdata.file_details,
+      file_theme: formdata.file_theme,
+      file_direction: formdata.file_direction,
       accessToken: localStorage.getItem("accessToken")
     });
   },

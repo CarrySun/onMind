@@ -133,9 +133,42 @@ a {
 
 .el-badge__content.is-fixed {
   position: absolute;
-  right: 30px!important;
+  right: 30px !important;
   top: 5px;
 }
-.el-tag{
+.el-tag {
   margin-right: 5px;
+}
+
+//zoom
+.el-input-number__decrease {
+  top: 0px;
+  left: 0px !important;
+  border: none;
+  border-radius: 0;
+}
+.el-input-number__increase {
+  top: auto;
+  left: 0;
+  bottom: 1px;
+  border: none;
+  border-radius: 0;
+}
+.el-input-number .el-input__inner {
+  position: absolute;
+  top: 35px;
+  width: 33px;
+  border-radius: 0;
+  height: 40px;
+  padding: 0;
+  border: none;
+}
+
+/*tabs*/
+.el-tabs--border-card .el-tabs__item {
+  height: 30px;
+  line-height: 30px;
+}
+.el-tabs--border-card > .el-tabs__content {
+  padding: 8px !important;
 }

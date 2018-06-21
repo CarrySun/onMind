@@ -4,6 +4,7 @@ var fs = require("fs");
 var path = require("path");
 var mongoose = require("mongoose");
 var db = "mongodb://localhost/onmind";
+// var db = "mongodb://simpleUser:simplePass@localhost/onmind";
 mongoose.Promise = require("bluebird");
 mongoose.connect(db);
 

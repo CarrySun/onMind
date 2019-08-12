@@ -98,7 +98,8 @@ exports.list = async (ctx, next) => {
   var user = ctx.session.user;
   var data = [];
   if (listType == "file_owner") {
-    console.log(body.file_title);
+    body.file_title = body.file_title ? body.file_title : ''
+    console.log('file_title：' + body.file_title);
     data = await File.find({
       file_owner: user._id,
       file_title: { $regex: body.file_title, $options: "i" }

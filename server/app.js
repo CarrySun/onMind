@@ -65,7 +65,7 @@ io.on("connection", function(socket) {
     }
     console.log("在线的人:");
     console.log(user);
-    socket.emit("login", "hello" + _id);
+    socket.emit("login", "hello " + _id);
   });
   socket.on("logout", function(_id) {
     console.log("------------------------走了一个人--------------------");

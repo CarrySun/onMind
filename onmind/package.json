@@ -12,7 +12,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "element-ui": "^2.3.4",
-    "node-sass": "^4.9.0",
+    "node-sass": "^4.13.1",
     "sass-loader": "^6.0.7",
     "socket.io-client": "^2.1.1",
     "vue": "^2.5.2",

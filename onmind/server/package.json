@@ -16,7 +16,7 @@
     "koa-router": "^7.4.0",
     "koa-session": "^5.8.1",
     "mongoose": "^5.0.15",
-    "nodemailer": "^4.6.4",
+    "nodemailer": "^6.4.16",
     "nodemailer-smtp-transport": "^2.7.4",
     "socket.io": "^2.1.1",
     "speakeasy": "^2.0.0",
